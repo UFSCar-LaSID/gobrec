@@ -222,10 +222,6 @@ Details on how to contribute to the GOBRec development can be viewed in the [con
 
 GOBRec is licensed under the [MIT License](/LICENSE).
 
-## Citation
-
-TODO: PUT CITATION BIBTEX
-
 ## References
 
 [1] Lihong Li, Wei Chu, John Langford, and Robert E. Schapire. A contextual-bandit 
