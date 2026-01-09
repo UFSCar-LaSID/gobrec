@@ -86,6 +86,10 @@ recommender.recommend(np.array([[1, 1, 0], [0, 1, 1]]))
 
 ## Performance comparison
 
+To evaluate the computational efficiency of GOBRec, we compared its execution time against [Mab2Rec](https://github.com/fidelity/mab2rec) and [iRec](https://github.com/irec-org/irec) recommendation libraries on three [MovieLens](https://grouplens.org/datasets/movielens/) datasets of increasing scale.
+
+Experiments were conducted in an incremental offline setting. The first 50% of interactions were used to warm up the models, while the remaining data were divided into ten equally sized windows. In each window, recommendations were generated, and the underlying models were incrementally updated using the observed decisions. Each experiment was repeated five times, with the average elapsed execution time and the speed-up achieved by GOBRec reported in the Table bellow.
+
 <div>
   <table>
     <thead>
@@ -181,6 +185,9 @@ recommender.recommend(np.array([[1, 1, 0], [0, 1, 1]]))
   </table>
 </div>
 
+The results highlight the computational efficiency of GOBRec, particularly for the LinGreedy and LinTS models, for which the GPU-enabled implementation achieves speed-ups of more than 400× and 700×, respectively, compared to Mab2Rec. Similar trends are observed in comparisons with iRec, where GOBRec consistently outperforms the baseline library across all evaluated CMAB models and datasets.
+
+Scalability analysis reveals that GOBRec maintains near-linear time complexity relative to interaction volume; a 100× increase in data resulted in only a 121× increase in execution time for LinTS. In contrast, baselines exhibited super-linear growth (up to 558×), demonstrating GOBRec’s suitability for production-scale interaction matrices. Results show that even in scenarios with limited GPU availability, the optimized CPU implementation of GOBRec can substantially outperform competing libraries, achieving speed-ups of more than 100× for the LinGreedy model in all MovieLens datasets.
 
 ## Available algorithms
 
