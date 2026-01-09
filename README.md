@@ -1,3 +1,8 @@
+
+<p align="center">
+  <img src="figs/GOBRecLogo.svg" alt="GOBRec Logo">
+</p>
+
 # GOBRec: GPU Optimized Bandits Recommender
 
 GOBRec is a Python library with an optimized implementation of contextual multi-armed bandits (CMABs) for recommender systems. The library has a simple API that allows you to use the CMAB algorithms to generate item (arms) expectations, using it for tasks other than recommendations. You can also use any of the implemented CMABs inside the Recommender to efficiently generate top-K recommendations.
