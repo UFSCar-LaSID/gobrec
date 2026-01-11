@@ -7,7 +7,8 @@
   <a href="#gobrec-gpu-optimized-bandits-recommender">🚀 Introduction</a> |
   <a href="#library-design">🏗️ Library design</a> |
   <a href="#installation">📦 Installation</a> |
-  <a href="#usage">🧩 Usage</a> |
+  <a href="#usage">🧩 Usage</a>
+  <br>
   <a href="#performance-comparison">⚡ Benchmark</a> |
   <a href="/CONTRIBUTING.md">🤝 Contributing</a> |
   <a href="https://ufscar-lasid.github.io/gobrec/">📚 Documentation</a>
