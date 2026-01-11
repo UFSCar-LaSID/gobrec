@@ -3,6 +3,17 @@
   <img src="figs/GOBRecLogo.svg" alt="GOBRec Logo">
 </p>
 
+<div align="center">
+  
+[![PyPI](https://img.shields.io/pypi/v/gobrec)](https://pypi.org/project/gobrec)
+[![docs](https://img.shields.io/badge/docs-latest-blue)](https://ufscar-lasid.github.io/gobrec/)
+[![license](https://img.shields.io/github/license/UFSCar-LaSID/gobrec.svg)](https://github.com/UFSCar-LaSID/gobrec/blob/main/LICENSE)
+[![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](https://github.com/UFSCar-LaSID/gobrec/pulls)
+[![PyPI Downloads](https://static.pepy.tech/personalized-badge/gobrec?period=total&units=INTERNATIONAL_SYSTEM&left_color=GREY&right_color=GREEN&left_text=downloads)](https://pepy.tech/projects/gobrec)
+
+
+</div>
+
 <p align="center">
   <a href="#gobrec-gpu-optimized-bandits-recommender">🚀 Introduction</a> |
   <a href="#library-design">🏗️ Library design</a> |
