@@ -27,9 +27,9 @@
 
 # GOBRec: GPU Optimized Bandits Recommender
 
-GOBRec is a Python library with an optimized implementation of contextual multi-armed bandits (CMABs) for recommender systems. The library has a simple API that allows you to use the CMAB algorithms to generate item (arms) expectations, using it for tasks other than recommendations. You can also use any of the implemented CMABs inside the Recommender to efficiently generate top-K recommendations.
+GOBRec is a Python library with an optimized implementation of contextual multi-armed bandits (CMABs) for recommender systems. The library features a simple API that enables the use of CMAB algorithms to generate item (arms) expectations, allowing for tasks beyond recommendations. You can also use any of the implemented CMABs inside the Recommender to efficiently generate top-K recommendations.
 
-The main contribution of GOBRec is its efficient implementation. With the vectorized code, using only CPU, our implementation was up to X times faster than other libraries. Using GPU optimization, our library achieved a speed gain of Y times. More details about these comparisons can be found in the ["performance comparison" section](#performance-comparison). For more detailed information please visit the [GOBRec documentation](https://ufscar-lasid.github.io/gobrec/).
+The main contribution of GOBRec is its efficient implementation. With the vectorized code, using only CPU, our implementation was up to **150** times faster than other libraries. Using GPU optimization, our library achieved a speed gain of **700** times. More details about these comparisons can be found in the ["performance comparison" section](#performance-comparison). For more detailed information, please visit the [GOBRec documentation](https://ufscar-lasid.github.io/gobrec/).
 
 ## Library design
 
@@ -41,7 +41,7 @@ The library leverages vectorized operations and optional GPU acceleration to ena
 
 * **MAB Algorithm:** This module is responsible for incremental model updates and executing exploration strategies. It provides optimized implementations of widely used linear CMAB methods, including **LinUCB** [1], **LinTS** [2], and **LinGreedy** [3]. All supported linear algorithms share a common ridge regression formulation for parameter estimation, which is encapsulated in a reusable base implementation to promote extensibility. In addition, GOBRec provides a **MABAlgo** interface that specifies the required methods and parameters for implementing new bandit algorithms that can be integrated into the recommendation pipeline.
 
-* **Recommender:** It is responsible for efficiently ranking the item scores produced by a MAB algorithm and generating a top-K list of recommended items. It also handles the exclusion of previously consumed items from the recommendation set, ensuring that only eligible items are considered. The recommender operates independently of the underlying bandit implementation and can therefore be used with any algorithm conforming to the **MABAlgo** interface, facilitating the integration of new methods within the GOBRec framework.
+* **Recommender:** It is responsible for efficiently ranking the item scores produced by an MAB algorithm and generating a top-K list of recommended items. It also handles the exclusion of previously consumed items from the recommendation set, ensuring that only eligible items are considered. The recommender operates independently of the underlying bandit implementation and can therefore be used with any algorithm conforming to the **MABAlgo** interface, facilitating the integration of new methods within the GOBRec framework.
 
 The usage pipeline consists of feeding the recommender with context vectors, observed decisions (i.e., consumed item identifiers), and rewards (i.e., ratings or implicit feedback). These interactions are then used to update the underlying CMAB model incrementally. At inference time, new contexts are passed to the recommender, which invokes the MAB algorithm to score candidate items, filters previously consumed items, and returns a top-K recommendation list.
 
@@ -63,7 +63,7 @@ This section shows two examples of how to use GOBRec. You can also use the avail
 
 ### Using an MAB Algorithm individually to generate arm scores
 
-It is possible to generate item (arm) expectations by using an MAB Algorithm alone. That way it is possible to use these algorithms for others tasks than recommendation.
+It is possible to generate item (arm) expectations by using an MAB Algorithm alone. That way, it is possible to use these algorithms for tasks other than recommendation.
 
 ```python
 import numpy as np
