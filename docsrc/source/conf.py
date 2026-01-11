@@ -11,7 +11,7 @@ import sys
 sys.path.insert(0, os.path.abspath('../..'))
 
 project = 'GOBRec'
-copyright = '2025, LaSID'
+copyright = '2026, LaSID'
 author = 'Gregorio'
 release = '0.4.0'
 html_title = "GOBRec"
@@ -49,12 +49,12 @@ html_theme_options = {
     "navbar_start": ["navbar-logo"],
     "navbar_center": ["navbar-nav"],
 }
-html_baseurl = "https://recsys-ufscar.github.io/gobrec/"
+html_baseurl = "https://UFSCar-LaSID.github.io/gobrec/"
 html_static_path = ['_static']
 
 html_context = {
     "display_github": True,
-    "github_user": "recsys-ufscar",
+    "github_user": "UFSCar-LaSID",
     "github_repo": "gobrec",
     "github_version": "main",
     "conf_py_path": "/docs/",
