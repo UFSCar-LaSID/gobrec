@@ -55,7 +55,7 @@ pip install gobrec
 
 The recommended Python version to use is 3.8.20 (but newer versions should work too). For using GPU optimization, it is important to install PyTorch with CUDA implementation. More details on installing PyTorch with CUDA can be found in the [PyTorch documentation](https://pytorch.org/get-started/locally/). The recommended PyTorch version to use is 2.4.1.
 
-More installation options can be found in the [documentation]().
+More installation options can be found in the [documentation](https://ufscar-lasid.github.io/gobrec/installation.html).
 
 ## Usage
 
