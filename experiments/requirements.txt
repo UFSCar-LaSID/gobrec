@@ -11,3 +11,6 @@ mab2rec==1.3.1
 plotly==5.22.0
 kaleido==0.2.1
 unidecode==1.4.0
+gobrec
+scikit-learn
+numba

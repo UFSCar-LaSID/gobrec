@@ -5,7 +5,29 @@ This folder contains the necessary scripts for executing the [GOBRec](https://gi
 
 ## Installation
 
+It is necessary to make some installations before executing the experiments. In the following two sections, it will be explained how to install the necessary Python packages and the public datasets (e.g., MovieLens) to benchmark on them.
+
 ### Python packages
+
+To install the necessary python packages, it is recommended to create an python 3.8 virtual environment. Using anaconda, it is possible to do that with the following command:
+
+```
+conda create -n gobrec_benchmark python=3.8
+```
+
+And then activate this environment with the command:
+
+```
+conda activate gobrec_benchmark
+```
+
+Finally, use the `requirements.txt` to install the packages. Inside this folder (`experiments`), execute the following command:
+
+```
+pip install -r requirements.txt
+```
+
+After this all necessary packages will be installed. It is possible to execute experiments with toy datasets only with this installation, but if you want to execute experiments with public dataset (e.g. MovieLens), it is necessary to install them. The next subsection helps with the installation of the available public datasets.
 
 ### Public datasets
 
