@@ -42,6 +42,12 @@ After this all necessary packages will be installed. It is possible to execute e
 
 ### Public datasets
 
+At moment we have benchmarks on [MovieLens](https://grouplens.org/datasets/movielens/). The list bellow gives the datasets download links and how to install it to execute the experiments:
+
+* [MovieLens-100K (ml-100k)](https://grouplens.org/datasets/movielens/100k/): download it and unzip in the `experiments/datasets` folder. You can mantain only the `experiments/datasets/ml-100k/u.data` and `experiments/datasets/ml-100k/u.item` files.
+* [MovieLens-1M (ml-1m)](https://grouplens.org/datasets/movielens/1m/): download it and unzip in the `experiments/datasets` folder. You can mantain only the `experiments/datasets/ml-1m/ratings.dat` and `experiments/datasets/ml-1m/movies.dat` files.
+* [MovieLens-10M (ml-10m)](https://grouplens.org/datasets/movielens/10m/): download it and unzip in the `experiments/datasets` folder. You can mantain only the `experiments/datasets/ml-10m/ratings.dat` and `experiments/datasets/ml-10m/movies.dat` files.
+
 ## Executing experiments
 
 ## Generating metrics (plots)
