@@ -114,4 +114,6 @@ The `not_incremental` experiment will train the algorithm on 50% of the dataset 
 
 ## Generating metrics (plots and tables)
 
+After executing the experiments, the necessary data to generate plots and tables will be generated. You can generate them by using the `generate_metrics.ipynb` Jupyter notebook. In the notebook cells, you can change the datasets, algorithms, and other settings of the plots and tables. The important codes that could be changed to modify these configurations are commented with `CHANGE HERE`.
+
 ## Expected results
