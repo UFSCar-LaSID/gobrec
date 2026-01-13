@@ -50,6 +50,68 @@ At moment we have benchmarks on [MovieLens](https://grouplens.org/datasets/movie
 
 ## Executing experiments
 
-## Generating metrics (plots)
+After installing the necessary Python packages and datasets, it is possible to start executing the experiments. To do that, execute the following command:
+
+```
+python execution_time_test.py
+```
+
+Executing this Python code will ask you which datasets, algorithms and experiment type to use. Input the datasets, algorithms and experiment type indexes separated by space to select the wanted options.
+
+Another way to select the options is by executing the command below:
+
+```
+python execution_time_test.py --datasets <datasets> --algorithms <algorithms> --experiments <experiments>
+```
+
+Replace `<datasets>` with the names (or indexes) of the datasets separated by comma (","). The available datasets to use are:
+
+- \[1\]: toy_dataset_1k_100k
+- \[2\]: toy_dataset_1k_500k
+- \[3\]: toy_dataset_1k_1M
+- \[4\]: toy_dataset_1k_5M
+- \[5\]: toy_dataset_1k_15M
+- \[6\]: toy_dataset_1k_30M
+- \[7\]: toy_dataset_10k_100k
+- \[8\]: toy_dataset_10k_500k
+- \[9\]: toy_dataset_10k_1M
+- \[10\]: toy_dataset_10k_5M
+- \[11\]: toy_dataset_10k_15M
+- \[12\]: toy_dataset_10k_30M
+- \[13\]: toy_dataset_100k_500k
+- \[14\]: toy_dataset_100k_1M
+- \[15\]: toy_dataset_100k_5M
+- \[16\]: toy_dataset_100k_15M
+- \[17\]: toy_dataset_100k_30M
+- \[18\]: ml-100k
+- \[19\]: ml-1m
+- \[20\]: ml-10m
+- all (it will use all datasets)
+
+Replace `<algorithms>` with the names (or indexes) of the algorithms separated by comma (","). The available algorithms to execute are:
+
+- \[1\]: mab2rec_LinUCB
+- \[2\]: mab2rec_LinGreedy
+- \[3\]: mab2rec_LinTS
+- \[4\]: gobrec_LinUCB_CPU
+- \[5\]: gobrec_LinGreedy_CPU
+- \[6\]: gobrec_LinTS_CPU
+- \[7\]: gobrec_LinUCB_GPU
+- \[8\]: gobrec_LinGreedy_GPU
+- \[9\]: gobrec_LinTS_GPU
+- \[10\]: irec_LinUCB
+- \[11\]: irec_LinGreedy
+- \[12\]: irec_LinTS
+- all (it will use all algorithms)
+
+Replace `<experiments>` with the names (or indexes) of the experiments separated by comma (","). The available experiments to execute are:
+
+- \[1\]: not_incremental
+- \[2\]: incremental
+- all (it will use all experiments types)
+
+The `not_incremental` experiment will train the algorithm on 50% of the dataset and then generate the recommendations for the other 50%. In the `incremental` setup, it the algorithmn will be trained in 50% of the dataset, and the rest of the dataset will be splited in 10 windows, making recommendations and training on incrementaly on each window.
+
+## Generating metrics (plots and tables)
 
 ## Expected results
