@@ -6,7 +6,7 @@
 <p align="center">
   ⚙️ <a href="#installation">Installation</a> |
   🚀 <a href="#executing-experiments">Executing Experiments</a> |
-  📈 <a href="#generating-metrics-plots">Generating Metrics (Plots)</a> |
+  📈 <a href="#generating-metrics-plots-and-tables">Generating Metrics (Plots)</a> |
   ✅ <a href="#expected-results">Expected Results</a>
 </p>
 
