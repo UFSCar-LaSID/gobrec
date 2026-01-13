@@ -20,7 +20,7 @@ It is necessary to make some installations before executing the experiments. In 
 
 ### Python packages
 
-To install the necessary python packages, it is recommended to create an python 3.8 virtual environment. Using anaconda, it is possible to do that with the following command:
+To install the necessary Python packages, it is recommended to create a Python 3.8 virtual environment. Using Anaconda, it is possible to do that with the following command:
 
 ```
 conda create -n gobrec_benchmark python=3.8
@@ -38,15 +38,15 @@ Finally, use the `requirements.txt` to install the packages. Inside this folder 
 pip install -r requirements.txt
 ```
 
-After this all necessary packages will be installed. It is possible to execute experiments with toy datasets only with this installation, but if you want to execute experiments with public dataset (e.g. MovieLens), it is necessary to install them. The next subsection helps with the installation of the available public datasets.
+After this, all necessary packages will be installed. It is possible to execute experiments with toy datasets only with this installation, but if you want to execute experiments with a public dataset (e.g., MovieLens), it is necessary to install it. The next subsection helps with the installation of the available public datasets.
 
 ### Public datasets
 
-At moment we have benchmarks on [MovieLens](https://grouplens.org/datasets/movielens/). The list bellow gives the datasets download links and how to install it to execute the experiments:
+At the moment, we have benchmarks on [MovieLens](https://grouplens.org/datasets/movielens/). The list below gives the datasets' download links and how to install them to execute the experiments:
 
-* [MovieLens-100K (ml-100k)](https://grouplens.org/datasets/movielens/100k/): download it and unzip in the `experiments/datasets` folder. You can mantain only the `experiments/datasets/ml-100k/u.data` and `experiments/datasets/ml-100k/u.item` files.
-* [MovieLens-1M (ml-1m)](https://grouplens.org/datasets/movielens/1m/): download it and unzip in the `experiments/datasets` folder. You can mantain only the `experiments/datasets/ml-1m/ratings.dat` and `experiments/datasets/ml-1m/movies.dat` files.
-* [MovieLens-10M (ml-10m)](https://grouplens.org/datasets/movielens/10m/): download it and unzip in the `experiments/datasets` folder. You can mantain only the `experiments/datasets/ml-10m/ratings.dat` and `experiments/datasets/ml-10m/movies.dat` files.
+* [MovieLens-100K (ml-100k)](https://grouplens.org/datasets/movielens/100k/): download it and unzip in the `experiments/datasets` folder. You can maintain only the `experiments/datasets/ml-100k/u.data` and `experiments/datasets/ml-100k/u.item` files.
+* [MovieLens-1M (ml-1m)](https://grouplens.org/datasets/movielens/1m/): download it and unzip in the `experiments/datasets` folder. You can maintain only the `experiments/datasets/ml-1m/ratings.dat` and `experiments/datasets/ml-1m/movies.dat` files.
+* [MovieLens-10M (ml-10m)](https://grouplens.org/datasets/movielens/10m/): download it and unzip in the `experiments/datasets` folder. You can maintain only the `experiments/datasets/ml-10m/ratings.dat` and `experiments/datasets/ml-10m/movies.dat` files.
 
 ## Executing experiments
 
@@ -56,7 +56,7 @@ After installing the necessary Python packages and datasets, it is possible to s
 python execution_time_test.py
 ```
 
-Executing this Python code will ask you which datasets, algorithms and experiment type to use. Input the datasets, algorithms and experiment type indexes separated by space to select the wanted options.
+Executing this Python code will ask you which datasets, algorithms, and experiment type to use. Input the datasets, algorithms, and experiment type indexes separated by space to select the wanted options.
 
 Another way to select the options is by executing the command below:
 
@@ -64,7 +64,7 @@ Another way to select the options is by executing the command below:
 python execution_time_test.py --datasets <datasets> --algorithms <algorithms> --experiments <experiments>
 ```
 
-Replace `<datasets>` with the names (or indexes) of the datasets separated by comma (","). The available datasets to use are:
+Replace `<datasets>` with the names (or indexes) of the datasets separated by commas (","). The available datasets to use are:
 
 - \[1\]: toy_dataset_1k_100k
 - \[2\]: toy_dataset_1k_500k
@@ -88,7 +88,7 @@ Replace `<datasets>` with the names (or indexes) of the datasets separated by co
 - \[20\]: ml-10m
 - all (it will use all datasets)
 
-Replace `<algorithms>` with the names (or indexes) of the algorithms separated by comma (","). The available algorithms to execute are:
+Replace `<algorithms>` with the names (or indexes) of the algorithms separated by commas (","). The available algorithms to execute are:
 
 - \[1\]: mab2rec_LinUCB
 - \[2\]: mab2rec_LinGreedy
@@ -104,21 +104,21 @@ Replace `<algorithms>` with the names (or indexes) of the algorithms separated b
 - \[12\]: irec_LinTS
 - all (it will use all algorithms)
 
-Replace `<experiments>` with the names (or indexes) of the experiments separated by comma (","). The available experiments to execute are:
+Replace `<experiments>` with the names (or indexes) of the experiments separated by commas (","). The available experiments to execute are:
 
 - \[1\]: not_incremental
 - \[2\]: incremental
-- all (it will use all experiments types)
+- all (it will use all experiment types)
 
-The `not_incremental` experiment will train the algorithm on 50% of the dataset and then generate the recommendations for the other 50%. In the `incremental` setup, it the algorithmn will be trained in 50% of the dataset, and the rest of the dataset will be splited in 10 windows, making recommendations and training on incrementaly on each window.
+The `not_incremental` experiment will train the algorithm on 50% of the dataset and then generate the recommendations for the other 50%. In the `incremental` setup, the algorithm will be trained on 50% of the dataset, and the rest of the dataset will be split into 10 windows, making recommendations and training incrementally on each window.
 
 ## Generating metrics (plots and tables)
 
-After executing the experiments, the necessary data to generate plots and tables will be generated. You can generate them by using the `generate_metrics.ipynb` Jupyter notebook. In the notebook cells, you can change the datasets, algorithms, and other settings of the plots and tables. The important codes that could be changed to modify these configurations are commented with `CHANGE HERE`.
+After executing the experiments, you will have the necessary data to generate the plots and tables. You can create them by using the `generate_metrics.ipynb` Jupyter notebook. In the notebook cells, you can change the datasets, algorithms, and other settings of the plots and tables. The important codes that could be modified to change these configurations are commented with `CHANGE HERE`.
 
 ## Expected results
 
-Originally, the experiments were conducted on a workstation equipped with an NVIDIA RTX 3090 GPU and an Intel Xeon E5-2630 v4 CPU, with and without GPU acceleration. If executed in the same architeture mentioned, it is expected to obtain the results shown in the table bellow:
+Originally, the experiments were conducted on a workstation equipped with an NVIDIA RTX 3090 GPU and an Intel Xeon E5-2630 v4 CPU, with and without GPU acceleration. If executed in the same architecture mentioned, it is expected to obtain the results shown in the table below:
 
 <div>
   <table>
