@@ -14,3 +14,91 @@ html[data-theme="dark"] {
 .bd-header {
   height: 85px !important;
 }
+
+
+
+
+/* =========================
+   General table styling
+   ========================= */
+
+table {
+  border-collapse: separate;
+  border-spacing: 0;
+  width: 100%;
+  margin: 1.5rem 0;
+  font-size: 0.95rem;
+}
+
+/* Header */
+table thead th {
+  text-align: center;
+  font-weight: 600;
+  padding: 0.6rem 0.8rem;
+  border-bottom: 2px solid var(--pst-color-border);
+  white-space: nowrap;
+}
+
+/* Body cells */
+table tbody td {
+  padding: 0.5rem 0.8rem;
+  text-align: center;
+  vertical-align: middle;
+  border-bottom: 1px solid var(--pst-color-border);
+  white-space: nowrap;
+}
+
+/* First column (labels like CPU / GPU / Time) */
+table tbody td:first-child,
+table thead th:first-child {
+  text-align: left;
+  font-weight: 500;
+}
+
+/* Section separators (MovieLens-100k / 1M / 10M rows) */
+table tbody tr.section-header td {
+  text-align: center;
+  font-weight: 600;
+  padding-top: 0.9rem;
+  border-bottom: none;
+}
+
+/* Zebra striping */
+table tbody tr:nth-child(even) {
+  background-color: var(--pst-color-background-alt);
+}
+
+/* Hover highlight */
+table tbody tr:hover {
+  background-color: rgba(100, 150, 255, 0.08);
+}
+
+tbody tr th {
+  text-align: center;
+}
+
+/* =========================
+   Dark mode fine tuning
+   ========================= */
+
+html[data-theme="dark"] table tbody tr:nth-child(even) {
+  background-color: rgba(255, 255, 255, 0.03);
+}
+
+html[data-theme="dark"] table thead th {
+  border-bottom-color: rgba(255, 255, 255, 0.15);
+}
+
+/* =========================
+   Numeric emphasis
+   ========================= */
+
+/* Speedups like "192.1×" */
+table td:contains("×") {
+  font-weight: 600;
+}
+
+/* Time values */
+table td:contains("Time") {
+  font-style: italic;
+}
