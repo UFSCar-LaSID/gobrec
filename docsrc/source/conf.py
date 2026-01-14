@@ -14,7 +14,8 @@ project = 'GOBRec'
 copyright = '2026, LaSID'
 author = 'Gregorio'
 release = '0.4.0'
-html_title = "GOBRec"
+html_logo = "_static/GOBRecLogo.svg"
+# html_title = "GOBRec"
 
 # -- General configuration ---------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration

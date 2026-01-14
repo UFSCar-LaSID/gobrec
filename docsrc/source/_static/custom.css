@@ -3,5 +3,14 @@ img {
 }
 
 html[data-theme="dark"] {
-  --pst-color-background: #000000; /* example */
+  --pst-color-background: #101010; /* example */
+  --pst-color-on-background: #000000; /* example */
+}
+
+.logo__image {
+  height: 80px !important;
+}
+
+.bd-header {
+  height: 85px !important;
 }
