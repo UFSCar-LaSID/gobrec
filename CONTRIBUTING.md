@@ -5,7 +5,7 @@ In this page, we describe how you can contribute to the development of the GOBRe
 
 ## Issues
 
-Please, [open an issue](https://github.com/RecSys-UFSCar/gobrec/issues) mainly for these reasons:
+Please, [open an issue](https://github.com/UFSCar-LaSID/gobrec/issues) mainly for these reasons:
 
 * Report a bug
 * Make suggestions for ways to improve the code
@@ -16,7 +16,7 @@ When opening an issue, try to be as detailed as possible, giving examples, print
 
 ## Pull requests
 
-Please, make a [pull request](https://github.com/RecSys-UFSCar/gobrec/pulls) when:
+Please, make a [pull request](https://github.com/UFSCar-LaSID/gobrec/pulls) when:
 
 * Fixed a bug
 * Fixed some documentation
