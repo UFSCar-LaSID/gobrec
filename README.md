@@ -223,6 +223,8 @@ The results highlight the computational efficiency of GOBRec, particularly for t
 
 Scalability analysis reveals that GOBRec maintains near-linear time complexity relative to interaction volume; a 100× increase in data resulted in only a 121× increase in execution time for LinTS. In contrast, baselines exhibited super-linear growth (up to 558×), demonstrating GOBRec’s suitability for production-scale interaction matrices. Results show that even in scenarios with limited GPU availability, the optimized CPU implementation of GOBRec can substantially outperform competing libraries, achieving speed-ups of more than 100× for the LinGreedy model in all MovieLens datasets.
 
+The conducted experiments can be reproduced using the [code available in the `experiments` folder of this repository](https://github.com/UFSCar-LaSID/gobrec/tree/main/experiments).
+
 ## Available algorithms
 
 Available linear CMABs:
