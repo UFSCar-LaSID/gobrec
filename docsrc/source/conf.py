@@ -51,6 +51,7 @@ html_theme_options = {
 }
 html_baseurl = "https://UFSCar-LaSID.github.io/gobrec/"
 html_static_path = ['_static']
+html_css_files = ['custom.css']
 
 html_context = {
     "display_github": True,
