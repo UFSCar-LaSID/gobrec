@@ -1,5 +1,5 @@
 
-# Contributing to GOBRec
+# Contributing
 
 In this page, we describe how you can contribute to the development of the GOBRec library. Firstly, we explain when to use issues or pull requests, and then some development tools are explained.
 
