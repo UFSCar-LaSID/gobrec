@@ -26,7 +26,3 @@ pip install setuptools wheel                           # Install the tools for g
 python setup.py sdist bdist_wheel                      # Generates the build
 pip install dist/gobrec-X.X.X-py3-none-any.whl         # Install it using pip (replace the X.X.X with the desired version)
 ```
-
-## Testing the installation
-
-TODO
