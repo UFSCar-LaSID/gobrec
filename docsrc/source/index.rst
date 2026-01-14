@@ -1,6 +1,7 @@
 
 .. image:: _static/GOBRecLogo.svg
    :align: center
+   :width: 50%
 
 GOBRec: GPU Optimized Bandits Recommender
 =========================================

@@ -1,3 +1,7 @@
 img {
   background: transparent !important;
 }
+
+html[data-theme="dark"] {
+  --pst-color-background: #000000; /* example */
+}
