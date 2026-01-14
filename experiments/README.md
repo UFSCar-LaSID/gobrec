@@ -1,6 +1,6 @@
 
 <p align="center">
-  <img src="../figs/GOBRecLogo.svg" alt="GOBRec Logo">
+  <img src="../docsrc/source/_static/GOBRecLogo.svg" alt="GOBRec Logo">
 </p>
 
 <p align="center">

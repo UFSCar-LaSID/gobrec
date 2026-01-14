@@ -1,6 +1,6 @@
 
 <p align="center">
-  <img src="figs/GOBRecLogo.svg" alt="GOBRec Logo">
+  <img src="docsrc/source/_static/GOBRecLogo.svg" alt="GOBRec Logo">
 </p>
 
 <div align="center">
@@ -34,7 +34,7 @@ The main contribution of GOBRec is its efficient implementation. With the vector
 ## Library design
 
 <p align="center">
-  <img src="figs/GOBRecDesign.png" alt="GOBRec Design diagram">
+  <img src="docsrc/source/_static/GOBRecDesign.png" alt="GOBRec Design diagram">
 </p>
 
 The library leverages vectorized operations and optional GPU acceleration to enable efficient training and inference in large-scale settings. The library is structured around two core components: *(i)* the **MAB algorithm** and *(ii)* the **Recommender**, explained further in detail. Together, these components support incremental learning and the generation of top-K recommendations in an online setting.
