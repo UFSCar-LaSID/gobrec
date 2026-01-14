@@ -1,14 +1,58 @@
+
+
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "gobrec"
+version = "1.0.6"
+description = "GOBRec: GPU Optimized Bandits Recommender"
+readme = "pypi_README.md"
+
+authors = [
+    { name = "Gregório Fornetti Azevedo", email = "gregorio.fornetti@estudante.ufscar.br" },
+    { name = "Pedro Rei Pires", email = "pedro.pires@dcomp.sor.ufscar.br" },
+    { name = "Rafael Tofoli Sereicikas", email = "rafaeltofoli@estudante.ufscar.br" },
+    { name = "Tiago Agostinho de Almeida", email = "talmeida@ufscar.br" }
+]
+license = "MIT"
+
+keywords = [
+    "recommender-systems",
+    "bandits",
+    "contextual-bandits",
+    "gpu",
+    "pytorch"
+]
+
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Science/Research",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
+    "Programming Language :: Python :: 3"
+]
+
+dependencies = [
+    "torch",
+    "numpy"
+]
+
+[project.urls]
+Documentation = "https://ufscar-lasid.github.io/gobrec/"
+Repository = "https://github.com/UFSCar-LaSID/gobrec"
+
+
+# Ruff stays exactly as you already have it
 [tool.ruff]
-# Apply to all Python files
 target-version = "py311"
 
 [tool.ruff.lint]
-# Enable docstring rules (Dxxx = pydocstyle)
 select = ["D"]
-
-# Ignore rules you don't want (example: allow missing __init__ docstrings)
 ignore = ["D107"]
 
-# Enforce NumPy-style docstrings
 [tool.ruff.lint.pydocstyle]
 convention = "numpy"
+
+[tool.setuptools]
+packages = ["gobrec"]

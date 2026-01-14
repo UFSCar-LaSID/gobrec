@@ -50,12 +50,12 @@ First, it is necessary to update the library version inside the [setup.py](https
 Then, you can execute the following command to generate the library builds:
 
 ```
-python setup.py sdist bdist_wheel
+python -m build
 ```
 
 
 And finally submit it to PyPI with he command below:
 
 ```
-twine upload dist/*
+python -m twine upload dist/*
 ```

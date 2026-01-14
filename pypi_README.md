@@ -1,40 +1,18 @@
 
 <p align="center">
-  <img src="docsrc/source/_static/GOBRecLogo.svg" alt="GOBRec Logo">
-</p>
-
-<div align="center">
-  
-[![PyPI](https://img.shields.io/pypi/v/gobrec)](https://pypi.org/project/gobrec)
-[![docs](https://img.shields.io/badge/docs-latest-blue)](https://ufscar-lasid.github.io/gobrec/)
-[![license](https://img.shields.io/github/license/UFSCar-LaSID/gobrec.svg)](https://github.com/UFSCar-LaSID/gobrec/blob/main/LICENSE)
-[![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](https://github.com/UFSCar-LaSID/gobrec/pulls)
-[![PyPI Downloads](https://static.pepy.tech/personalized-badge/gobrec?period=total&units=INTERNATIONAL_SYSTEM&left_color=GREY&right_color=GREEN&left_text=downloads)](https://pepy.tech/projects/gobrec)
-
-
-</div>
-
-<p align="center">
-  <a href="#gobrec-gpu-optimized-bandits-recommender">🚀 Introduction</a> |
-  <a href="#library-design">🏗️ Library design</a> |
-  <a href="#installation">📦 Installation</a> |
-  <a href="#usage">🧩 Usage</a>
-  <br>
-  <a href="#performance-comparison">⚡ Benchmark</a> |
-  <a href="/CONTRIBUTING.md">🤝 Contributing</a> |
-  <a href="https://ufscar-lasid.github.io/gobrec/">📚 Documentation</a>
+  <img src="https://raw.githubusercontent.com/UFSCar-LaSID/gobrec/refs/heads/main/docsrc/source/_static/GOBRecLogo.svg" alt="GOBRec Logo">
 </p>
 
 # GOBRec: GPU Optimized Bandits Recommender
 
 GOBRec is a Python library with an optimized implementation of contextual multi-armed bandits (CMABs) for recommender systems. The library features a simple API that enables the use of CMAB algorithms to generate item (arms) expectations, allowing for tasks beyond recommendations. You can also use any of the implemented CMABs inside the Recommender to efficiently generate top-K recommendations.
 
-The main contribution of GOBRec is its efficient implementation. With the vectorized code, using only CPU, our implementation was up to **150** times faster than other libraries. Using GPU optimization, our library achieved a speed gain of **700** times. More details about these comparisons can be found in the ["performance comparison" section](#performance-comparison). For more detailed information, please visit the [GOBRec documentation](https://ufscar-lasid.github.io/gobrec/).
+The main contribution of GOBRec is its efficient implementation. With the vectorized code, using only CPU, our implementation was up to **150** times faster than other libraries. Using GPU optimization, our library achieved a speed gain of **700** times. More details about these comparisons can be found in the "performance comparison" section. For more detailed information, please visit the [GOBRec documentation](https://ufscar-lasid.github.io/gobrec/).
 
 ## Library design
 
 <p align="center">
-  <img src="docsrc/source/_static/GOBRecDesign.png" alt="GOBRec Design diagram">
+  <img src="https://raw.githubusercontent.com/UFSCar-LaSID/gobrec/refs/heads/main/docsrc/source/_static/GOBRecDesign.png" alt="GOBRec Design diagram">
 </p>
 
 The library leverages vectorized operations and optional GPU acceleration to enable efficient training and inference in large-scale settings. The library is structured around two core components: *(i)* the **MAB algorithm** and *(ii)* the **Recommender**, explained further in detail. Together, these components support incremental learning and the generation of top-K recommendations in an online setting.
@@ -59,7 +37,7 @@ More installation options can be found in the [documentation](https://ufscar-las
 
 ## Usage
 
-This section shows two examples of how to use GOBRec. You can also use the available [Jupyter notebook](notebooks/usage_tutorial.ipynb) to reproduce the examples and verify the generated output.
+This section shows two examples of how to use GOBRec. You can also use the available [Jupyter notebook](https://github.com/UFSCar-LaSID/gobrec/blob/main/notebooks/usage_tutorial.ipynb) to reproduce the examples and verify the generated output.
 
 ### Using an MAB Algorithm individually to generate arm scores
 
@@ -130,9 +108,9 @@ Experiments were conducted in an incremental offline setting. The first 50% of i
       <tr>
         <th></th>
         <th></th>
-        <th colspan="3">LinGreedy</th>
-        <th colspan="3">LinUCB</th>
-        <th colspan="3">LinTS</th>
+        <td colspan="3" align="center">LinGreedy</td>
+        <td colspan="3" align="center">LinUCB</td>
+        <td colspan="3" align="center">LinTS</td>
       </tr>
       <tr>
         <th></th>
@@ -223,28 +201,28 @@ The results highlight the computational efficiency of GOBRec, particularly for t
 
 Scalability analysis reveals that GOBRec maintains near-linear time complexity relative to interaction volume; a 100× increase in data resulted in only a 121× increase in execution time for LinTS. In contrast, baselines exhibited super-linear growth (up to 558×), demonstrating GOBRec’s suitability for production-scale interaction matrices. Results show that even in scenarios with limited GPU availability, the optimized CPU implementation of GOBRec can substantially outperform competing libraries, achieving speed-ups of more than 100× for the LinGreedy model in all MovieLens datasets.
 
-The conducted experiments can be reproduced using the [code available in the `experiments` folder of this repository](/experiments).
+The conducted experiments can be reproduced using the [code available in the `experiments` folder of this repository](https://github.com/UFSCar-LaSID/gobrec/tree/main/experiments).
 
 ## Available algorithms
 
 Available linear CMABs:
 
-* [Lin](/gobrec/mabs/lin_mabs/lin.py) (only exploitation)
-* [LinUCB](/gobrec/mabs/lin_mabs/lin_ucb.py) [1]
-* [LinTS](/gobrec/mabs/lin_mabs/lin_ts.py) [2]
-* [LinGreedy](/gobrec/mabs/lin_mabs/lin_greedy.py) [3]
+* [Lin](https://github.com/UFSCar-LaSID/gobrec/blob/main/gobrec/mabs/lin_mabs/lin.py) (only exploitation)
+* [LinUCB](https://github.com/UFSCar-LaSID/gobrec/blob/main/gobrec/mabs/lin_mabs/lin_ucb.py) [1]
+* [LinTS](https://github.com/UFSCar-LaSID/gobrec/blob/main/gobrec/mabs/lin_mabs/lin_ts.py) [2]
+* [LinGreedy](https://github.com/UFSCar-LaSID/gobrec/blob/main/gobrec/mabs/lin_mabs/lin_greedy.py) [3]
 
 Available baselines:
 
-* [Random](/gobrec/mabs/random_mab.py)
+* [Random](https://github.com/UFSCar-LaSID/gobrec/blob/main/gobrec/mabs/random_mab.py)
 
 ## Contributing
 
-Details on how to contribute to the GOBRec development can be viewed in the [contributing documentation](/CONTRIBUTING.md).
+Details on how to contribute to the GOBRec development can be viewed in the [contributing documentation](https://github.com/UFSCar-LaSID/gobrec/blob/main/CONTRIBUTING.md).
 
 ## License
 
-GOBRec is licensed under the [MIT License](/LICENSE).
+GOBRec is licensed under the [MIT License](https://github.com/UFSCar-LaSID/gobrec/blob/main/LICENSE).
 
 ## References
 
