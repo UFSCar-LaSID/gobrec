@@ -141,8 +141,8 @@ datasets_options, wrappers_options, experiments_options = get_input(
             'options': DATASETS_TABLE
         },
         {
-            'name': 'wrappers',
-            'description': 'Wrappers to be used in the experiments',
+            'name': 'algorithms',
+            'description': 'Algorithms to be used in the experiments',
             'name_column': 'name',
             'options': WRAPPERS_TABLE
         },
