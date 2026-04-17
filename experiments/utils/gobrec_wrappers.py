@@ -99,7 +99,7 @@ class LinUCBGobrecWrapperGPU(BaseGobrecWrapper):
     Wrapper for the LinUCB algorithm in GOBRec.
     """
     def __init__(self):
-        self.mab_algo = gobrec.mabs.lin_mabs.LinUCB(l2_lambda=L2_LAMBDA, alpha=LINUCB_ALPHA, use_gpu=True, items_per_batch=5_000)
+        self.mab_algo = gobrec.mabs.lin_mabs.LinUCB(l2_lambda=L2_LAMBDA, alpha=LINUCB_ALPHA, use_gpu=True, items_per_batch=1_000)
         super().__init__()
 
 class LinGreedyGobrecWrapperGPU(BaseGobrecWrapper):
@@ -107,7 +107,7 @@ class LinGreedyGobrecWrapperGPU(BaseGobrecWrapper):
     Wrapper for the LinGreedy algorithm in GOBRec.
     """
     def __init__(self):
-        self.mab_algo = gobrec.mabs.lin_mabs.LinGreedy(l2_lambda=L2_LAMBDA, epsilon=LINGREEDY_EPSILON, use_gpu=True, items_per_batch=10_000)
+        self.mab_algo = gobrec.mabs.lin_mabs.LinGreedy(l2_lambda=L2_LAMBDA, epsilon=LINGREEDY_EPSILON, use_gpu=True, items_per_batch=1_000)
         super().__init__()
 
 class LinTSGobrecWrapperGPU(BaseGobrecWrapper):
@@ -115,5 +115,5 @@ class LinTSGobrecWrapperGPU(BaseGobrecWrapper):
     Wrapper for the LinGreedy algorithm in GOBRec.
     """
     def __init__(self):
-        self.mab_algo = gobrec.mabs.lin_mabs.LinTS(l2_lambda=L2_LAMBDA, alpha=LINTS_ALPHA, use_gpu=True, items_per_batch=3_000)
+        self.mab_algo = gobrec.mabs.lin_mabs.LinTS(l2_lambda=L2_LAMBDA, alpha=LINTS_ALPHA, use_gpu=True, items_per_batch=1_000)
         super().__init__()
