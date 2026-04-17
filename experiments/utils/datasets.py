@@ -15,7 +15,7 @@ DATASETS_TABLE = pd.DataFrame(
      [5,     'toy_dataset_1k_15M',     lambda: load_or_generate_toy_dataset(1_000,   15_000_000, os.path.join(TOY_DATASETS_SAVE_PATH, 'toy_dataset_1k_15M'))],
      [6,     'toy_dataset_1k_30M',     lambda: load_or_generate_toy_dataset(1_000,   30_000_000, os.path.join(TOY_DATASETS_SAVE_PATH, 'toy_dataset_1k_30M'))],
      
-     [7,     'toy_dataset_5k_500k',    lambda: load_or_generate_toy_dataset(5_000,   500_000,    os.path.join(TOY_DATASETS_SAVE_PATH, 'toy_dataset_1k_500k'))],
+     [7,     'toy_dataset_5k_500k',    lambda: load_or_generate_toy_dataset(5_000,   500_000,    os.path.join(TOY_DATASETS_SAVE_PATH, 'toy_dataset_5k_500k'))],
      
      [8,     'toy_dataset_10k_100k',   lambda: load_or_generate_toy_dataset(10_000,  100_000,    os.path.join(TOY_DATASETS_SAVE_PATH, 'toy_dataset_10k_100k'))],
      [9,     'toy_dataset_10k_500k',   lambda: load_or_generate_toy_dataset(10_000,  500_000,    os.path.join(TOY_DATASETS_SAVE_PATH, 'toy_dataset_10k_500k'))],
@@ -24,7 +24,7 @@ DATASETS_TABLE = pd.DataFrame(
      [12,    'toy_dataset_10k_15M',    lambda: load_or_generate_toy_dataset(10_000,  15_000_000, os.path.join(TOY_DATASETS_SAVE_PATH, 'toy_dataset_10k_15M'))],
      [13,    'toy_dataset_10k_30M',    lambda: load_or_generate_toy_dataset(10_000,  30_000_000, os.path.join(TOY_DATASETS_SAVE_PATH, 'toy_dataset_10k_30M'))],
      
-     [14,    'toy_dataset_50k_500k',   lambda: load_or_generate_toy_dataset(50_000,  500_000,    os.path.join(TOY_DATASETS_SAVE_PATH, 'toy_dataset_1k_500k'))],
+     [14,    'toy_dataset_50k_500k',   lambda: load_or_generate_toy_dataset(50_000,  500_000,    os.path.join(TOY_DATASETS_SAVE_PATH, 'toy_dataset_50k_500k'))],
      
      [15,    'toy_dataset_100k_500k',  lambda: load_or_generate_toy_dataset(100_000, 500_000,    os.path.join(TOY_DATASETS_SAVE_PATH, 'toy_dataset_100k_500k'))],
      [16,    'toy_dataset_100k_1M',    lambda: load_or_generate_toy_dataset(100_000, 1_000_000,  os.path.join(TOY_DATASETS_SAVE_PATH, 'toy_dataset_100k_1M'))],
