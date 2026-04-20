@@ -8,7 +8,7 @@ import numpy as np
 
 class BaseMab2recWrapper(BaseWrapper):
 
-    def __init__(self):
+    def __init__(self, context_size: int = None):
         self._init()
     
     def _init(self):
@@ -19,7 +19,7 @@ class BaseMab2recWrapper(BaseWrapper):
             n_jobs=-1
         )
     
-    def fit(self, interactions_df: pd.DataFrame, contexts: np.ndarray):
+    def fit(self, interactions_df: pd.DataFrame, contexts: np.ndarray, num_items: int = None):
         """
         Fit the MAB2Rec model to the interactions data.
         
@@ -74,7 +74,7 @@ class LinMab2RecWrapper(BaseMab2recWrapper):
     """
     Wrapper for the LinUCB algorithm in MAB2Rec.
     """
-    def __init__(self):
+    def __init__(self, context_size: int = None):
         self.mab2rec_learning_policy = LearningPolicy.LinGreedy(l2_lambda=L2_LAMBDA, epsilon=0)
         super().__init__()
 
@@ -82,7 +82,7 @@ class LinUCBMab2RecWrapper(BaseMab2recWrapper):
     """
     Wrapper for the LinUCB algorithm in MAB2Rec.
     """
-    def __init__(self):
+    def __init__(self, context_size: int = None):
         self.mab2rec_learning_policy = LearningPolicy.LinUCB(l2_lambda=L2_LAMBDA, alpha=LINUCB_ALPHA)
         super().__init__()
 
@@ -90,7 +90,7 @@ class LinGreedyMab2RecWrapper(BaseMab2recWrapper):
     """
     Wrapper for the LinGreedy algorithm in MAB2Rec.
     """
-    def __init__(self):
+    def __init__(self, context_size: int = None):
         self.mab2rec_learning_policy = LearningPolicy.LinGreedy(l2_lambda=L2_LAMBDA, epsilon=LINGREEDY_EPSILON)
         super().__init__()
 
@@ -98,6 +98,6 @@ class LinTSMab2RecWrapper(BaseMab2recWrapper):
     """
     Wrapper for the LinTS algorithm in MAB2Rec.
     """
-    def __init__(self):
+    def __init__(self, context_size: int = None):
         self.mab2rec_learning_policy = LearningPolicy.LinTS(l2_lambda=L2_LAMBDA, alpha=LINTS_ALPHA)
         super().__init__()
