@@ -1,7 +1,7 @@
 
 from utils.datasets import DATASETS_TABLE
 from utils.wrappers_table import WRAPPERS_TABLE
-from utils.constants import RESULTS_SAVE_PATH, NUM_EXECUTIONS_PER_EXPERIMENT, TRAIN_TIME_COLUMN, RECS_TIME_COLUMN, TOTAL_TIME_COLUMN, CONTEXTS_PER_BATCH
+from utils.constants import RESULTS_SAVE_PATH, NUM_EXECUTIONS_PER_EXPERIMENT, TRAIN_TIME_COLUMN, RECS_TIME_COLUMN, TOTAL_TIME_COLUMN, CONTEXTS_PER_BATCH, ITEM_ID_COLUMN
 from utils.parameters_handle import get_input
 from utils.BaseWrapper import BaseWrapper
 
@@ -17,6 +17,8 @@ def execute_not_incremental_experiment(wrapper: BaseWrapper, interactions_df: pd
     df_save_path = os.path.join(save_path, 'not_incremental.csv')
     num_necessary_executions = get_num_necessary_executions(df_save_path)
 
+    num_items = interactions_df[ITEM_ID_COLUMN].nunique()
+
     split_index = int(len(interactions_df) * 0.5)
 
     train_df = interactions_df.copy()[:split_index]
@@ -28,7 +30,7 @@ def execute_not_incremental_experiment(wrapper: BaseWrapper, interactions_df: pd
         start_time = time()
         for start in range(0, len(train_contexts), CONTEXTS_PER_BATCH):
             if start == 0:
-                wrapper.fit(train_df[start:start+CONTEXTS_PER_BATCH], train_contexts[start:start+CONTEXTS_PER_BATCH])
+                wrapper.fit(train_df[start:start+CONTEXTS_PER_BATCH], train_contexts[start:start+CONTEXTS_PER_BATCH], num_items=num_items)
             else:
                 wrapper.partial_fit(train_df[start:start+CONTEXTS_PER_BATCH], train_contexts[start:start+CONTEXTS_PER_BATCH])
         fit_time = time() - start_time
@@ -56,6 +58,8 @@ def execute_incremental_experiment(wrapper: BaseWrapper, interactions_df: pd.Dat
     df_save_path = os.path.join(save_path, 'incremental.csv')
     num_necessary_executions = get_num_necessary_executions(df_save_path)
 
+    num_items = interactions_df[ITEM_ID_COLUMN].nunique()
+
     split_index = int(len(interactions_df) * 0.5)
 
     train_df = interactions_df.copy()[:split_index]
@@ -74,7 +78,7 @@ def execute_incremental_experiment(wrapper: BaseWrapper, interactions_df: pd.Dat
         
         for start in range(0, len(train_contexts), CONTEXTS_PER_BATCH):
             if start == 0:
-                wrapper.fit(train_df[start:start+CONTEXTS_PER_BATCH], train_contexts[start:start+CONTEXTS_PER_BATCH])
+                wrapper.fit(train_df[start:start+CONTEXTS_PER_BATCH], train_contexts[start:start+CONTEXTS_PER_BATCH], num_items=num_items)
             else:
                 wrapper.partial_fit(train_df[start:start+CONTEXTS_PER_BATCH], train_contexts[start:start+CONTEXTS_PER_BATCH])
         fit_time = time() - start_time
@@ -166,7 +170,7 @@ for dataset_option in datasets_options:
         wrapper_name = WRAPPERS_TABLE.loc[wrapper_option, 'name']
         WrapperClass = WRAPPERS_TABLE.loc[wrapper_option, 'AlgoWrapper']
         print(f'Using wrapper {wrapper_name}...')
-        wrapper = WrapperClass()
+        wrapper = WrapperClass(context_size=contexts.shape[1])
 
         for experiment_option in experiments_options:
             experiment_name = EXPERIMENTS_TABLE.loc[experiment_option, 'name']

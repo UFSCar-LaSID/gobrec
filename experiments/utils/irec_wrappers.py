@@ -12,22 +12,12 @@ from utils.constants import (
 )
 from utils.BaseWrapper import BaseWrapper
 
-# Fixed number of dimensions for context representation
-CONTEXT_DIMENSION = 18
-# iRec requires the number of items to be known beforehand
-NUM_ITEMS = {
-    'ml-100k': 1682,
-    'ml-1m': 3706,
-    'ml-10m': 10677,
-}
-CURRENT_DATASET = 'ml-100k'
-
 import pandas as pd
 import numpy as np
 
 
 class BaseIrecWrapper(BaseWrapper):
-    def __init__(self):
+    def __init__(self, context_size: int = None):
         self._init()
     
     def _init(self):
@@ -38,7 +28,7 @@ class BaseIrecWrapper(BaseWrapper):
         )
         self.PLACEHOLDER_USER = 0
     
-    def fit(self, interactions_df: pd.DataFrame, contexts: np.ndarray):
+    def fit(self, interactions_df: pd.DataFrame, contexts: np.ndarray, num_items: int = None):
         """Fit the iRec model to the interactions data.
         
         Parameters:
@@ -52,7 +42,7 @@ class BaseIrecWrapper(BaseWrapper):
         # Create dataset
         train_dataset = Dataset(data=array_data)
         train_dataset.set_parameters()
-        train_dataset.update_num_total_users_items(num_total_items=NUM_ITEMS[CURRENT_DATASET]+1)
+        train_dataset.update_num_total_users_items(num_total_items=num_items+1)
         self.candidate_items = np.arange(train_dataset.num_total_items)
         self.num_total_items = train_dataset.num_total_items
 
@@ -116,11 +106,11 @@ class BaseIrecWrapper(BaseWrapper):
 class LinUCBIrecWrapper(BaseIrecWrapper):
     """Wrapper for LinearUCB algorithm in iRec."""
     
-    def __init__(self):
+    def __init__(self, context_size: int = None):
         # Value Function
         self.value_function = LinearUCB(
             alpha=LINUCB_ALPHA,
-            num_lat=CONTEXT_DIMENSION,
+            num_lat=context_size,
             iterations=20,
             var=0.05,
             user_var=0.01,
@@ -138,10 +128,10 @@ class LinUCBIrecWrapper(BaseIrecWrapper):
 class LinGreedyIrecWrapper(BaseIrecWrapper):
     """Wrapper for LinearEGreedy algorithm in iRec."""
     
-    def __init__(self):
+    def __init__(self, context_size: int = None):
         # Value Function
         self.value_function = LinearEGreedy(
-            num_lat=CONTEXT_DIMENSION,
+            num_lat=context_size,
             iterations=20,
             var=0.05,
             user_var=0.01,
@@ -159,10 +149,10 @@ class LinGreedyIrecWrapper(BaseIrecWrapper):
 class LinTSIrecWrapper(BaseIrecWrapper):
     """Wrapper for LinearTS algorithm in iRec."""
     
-    def __init__(self):
+    def __init__(self, context_size: int = None):
         # Value Function
         self.value_function = LinearThompsonSampling(
-            num_lat=CONTEXT_DIMENSION,
+            num_lat=context_size,
             iterations=20,
             var=0.05,
             user_var=0.01,
