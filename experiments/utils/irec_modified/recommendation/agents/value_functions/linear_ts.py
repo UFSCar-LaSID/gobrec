@@ -64,6 +64,7 @@ class LinearThompsonSampling(LinearICF):
         self.num_total_items = self.train_dataset.num_total_items
 
         self.num_latent_factors = len(self.items_means[0])
+        self.items_covs = np.random.uniform(-1, 1, size=(self.num_total_items, self.num_lat, self.num_lat))
 
     def actions_estimate(self, candidate_actions):
         """actions_estimate.

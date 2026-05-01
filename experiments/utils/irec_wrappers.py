@@ -128,6 +128,8 @@ class BaseIrecWrapper(BaseWrapper):
 
         # Set info, if needed
         self.info = self.get_info()
+        
+        self.partial_fit(interactions_df, contexts)
 
     def partial_fit(self, interactions_df: pd.DataFrame, contexts: np.ndarray):
         """
@@ -142,7 +144,7 @@ class BaseIrecWrapper(BaseWrapper):
             item_id = [row[ITEM_ID_COLUMN]]
             self.label_encoder.fit(item_id)
             item_id = self.label_encoder.transform(item_id)[0]
-            action = (self.PLACEHOLDER_USER, item_id)
+            action = (item_id, item_id)
             reward = float(row[RATING_COLUMN])
             self.agent.observe(observation=None, action=action, reward=reward, info=self.info)
         self.candidate_items = np.arange(len(self.label_encoder.classes_))
