@@ -1,8 +1,8 @@
-# Benchmark
+## Benchmark
 
-To evaluate the computational efficiency of GOBRec, we compared its execution time against [Mab2Rec](https://github.com/fidelity/mab2rec) and [iRec](https://github.com/irec-org/irec) recommendation libraries on three [MovieLens](https://grouplens.org/datasets/movielens/) datasets of increasing scale.
+Originally, the experiments were conducted on a workstation equipped with an NVIDIA RTX 3090 GPU and an Intel Xeon E5-2630 v4 CPU, with and without GPU acceleration. To reproduce our results, see the experiments code. If executed in the same architecture mentioned, it is expected to obtain the results shown below.
 
-Experiments were conducted in an incremental offline setting. The first 50% of interactions were used to warm up the models, while the remaining data were divided into ten equally sized windows. In each window, recommendations were generated, and the underlying models were incrementally updated using the observed decisions. Each experiment was repeated five times, with the average elapsed execution time and the speed-up achieved by GOBRec reported in the Table bellow.
+### MovieLens Datasets: Execution Time (min) and GOBRec CPU/GPU Speedups over mab2rec and iRec
 
 <div>
   <table>
@@ -99,8 +99,40 @@ Experiments were conducted in an incremental offline setting. The first 50% of i
   </table>
 </div>
 
-The results highlight the computational efficiency of GOBRec, particularly for the LinGreedy and LinTS models, for which the GPU-enabled implementation achieves speed-ups of more than 400× and 700×, respectively, compared to Mab2Rec. Similar trends are observed in comparisons with iRec, where GOBRec consistently outperforms the baseline library across all evaluated CMAB models and datasets.
+### LinGreedy - Toy Dataset (500k Interactions): Elapsed Time (s) vs. Number of Items
 
-Scalability analysis reveals that GOBRec maintains near-linear time complexity relative to interaction volume; a 100× increase in data resulted in only a 121× increase in execution time for LinTS. In contrast, baselines exhibited super-linear growth (up to 558×), demonstrating GOBRec’s suitability for production-scale interaction matrices. Results show that even in scenarios with limited GPU availability, the optimized CPU implementation of GOBRec can substantially outperform competing libraries, achieving speed-ups of more than 100× for the LinGreedy model in all MovieLens datasets.
+<img src="/docsrc/source/_static/items_lingreedy_enhance_and_time.svg" width="75%">
 
-The conducted experiments can be reproduced using the [code available in the `experiments` folder of GOBRec repository](https://github.com/UFSCar-LaSID/gobrec/tree/main/experiments).
+### LinGreedy - Toy Dataset (500k Interactions): Predicted Elapsed Time (s) vs. Predicted Number of Items
+
+<img src="/docsrc/source/_static/items_lingreedy_pred.svg" width="75%">
+
+### LinGreedy - Toy Dataset (1k Items): Elapsed Time (s) vs. Number of Interactions
+
+<img src="/docsrc/source/_static/interactions_lingreedy_enhance_and_time.svg" width="75%">
+
+### LinGreedy - Toy Dataset (1k Items): Predicted Elapsed Time (s) vs. Predicted Number of Interactions
+
+<img src="/docsrc/source/_static/interactions_lingreedy_pred.svg" width="75%">
+
+
+### LinUCB - Toy Dataset (500k Interactions): Elapsed Time (s) vs. Number of Items
+
+<img src="/docsrc/source/_static/items_linucb_enhance_and_time.svg" width="75%">
+
+### LinUCB - Toy Dataset (500k Interactions): Predicted Elapsed Time (s) vs. Predicted Number of Items
+
+<img src="/docsrc/source/_static/items_linucb_pred.svg" width="75%">
+
+### LinUCB - Toy Dataset (1k Items): Elapsed Time (s) vs. Number of Interactions
+
+<img src="/docsrc/source/_static/interactions_linucb_enhance_and_time.svg" width="75%">
+
+### LinUCB - Toy Dataset (1k Items): Predicted Elapsed Time (s) vs. Predicted Number of Interactions
+
+<img src="/docsrc/source/_static/interactions_linucb_pred.svg" width="75%">
+
+
+### Memory usage comparison
+
+<img src="/docsrc/source/_static/mem_plot.svg" width="75%">
