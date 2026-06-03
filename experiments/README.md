@@ -40,6 +40,8 @@ pip install -r requirements.txt
 
 After this, all necessary packages will be installed. It is possible to execute experiments with toy datasets only with this installation, but if you want to execute experiments with a public dataset (e.g., MovieLens), it is necessary to install it. The next subsection helps with the installation of the available public datasets.
 
+OBS: it is recommended to use PyTorch 2.4.1 with CUDA 12.5
+
 ### Public datasets
 
 At the moment, we have benchmarks on [MovieLens](https://grouplens.org/datasets/movielens/). The list below gives the datasets' download links and how to install them to execute the experiments:
