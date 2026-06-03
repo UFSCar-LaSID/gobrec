@@ -2,7 +2,9 @@
 
 Originally, the experiments were conducted on a workstation equipped with an NVIDIA RTX 3090 GPU and an Intel Xeon E5-2630 v4 CPU, with and without GPU acceleration. To reproduce our results, see the experiments code. If executed in the same architecture mentioned, it is expected to obtain the results shown below.
 
-## MovieLens Datasets: Execution Time (min) and GOBRec CPU/GPU Speedups over mab2rec and iRec
+## Real Datasets
+
+### MovieLens Datasets: Execution Time (min) and GOBRec CPU/GPU Speedups over mab2rec and iRec
 
 <div>
   <table>
@@ -99,11 +101,13 @@ Originally, the experiments were conducted on a workstation equipped with an NVI
   </table>
 </div>
 
-## LinGreedy - Toy Dataset (500k Interactions): Elapsed Time (s) vs. Number of Items
+## Simulated (toys) datasets
+
+### LinGreedy - Toy Dataset (500k Interactions): Elapsed Time (s) vs. Number of Items
 
 <img src="_static/items_lingreedy_enhance_and_time.svg" width="75%">
 
-## LinGreedy - Toy Dataset (500k Interactions): Predicted Elapsed Time (s) vs. Predicted Number of Items
+### LinGreedy - Toy Dataset (500k Interactions): Predicted Elapsed Time (s) vs. Predicted Number of Items
 
 <img src="_static/items_lingreedy_pred.svg" width="75%">
 

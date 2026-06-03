@@ -359,8 +359,10 @@
   <section id="benchmark">
 <h1>Benchmark<a class="headerlink" href="#benchmark" title="Link to this heading">#</a></h1>
 <p>Originally, the experiments were conducted on a workstation equipped with an NVIDIA RTX 3090 GPU and an Intel Xeon E5-2630 v4 CPU, with and without GPU acceleration. To reproduce our results, see the experiments code. If executed in the same architecture mentioned, it is expected to obtain the results shown below.</p>
+<section id="real-datasets">
+<h2>Real Datasets<a class="headerlink" href="#real-datasets" title="Link to this heading">#</a></h2>
 <section id="movielens-datasets-execution-time-min-and-gobrec-cpu-gpu-speedups-over-mab2rec-and-irec">
-<h2>MovieLens Datasets: Execution Time (min) and GOBRec CPU/GPU Speedups over mab2rec and iRec<a class="headerlink" href="#movielens-datasets-execution-time-min-and-gobrec-cpu-gpu-speedups-over-mab2rec-and-irec" title="Link to this heading">#</a></h2>
+<h3>MovieLens Datasets: Execution Time (min) and GOBRec CPU/GPU Speedups over mab2rec and iRec<a class="headerlink" href="#movielens-datasets-execution-time-min-and-gobrec-cpu-gpu-speedups-over-mab2rec-and-irec" title="Link to this heading">#</a></h3>
 <div>
   <table>
     <thead>
@@ -456,13 +458,17 @@
   </table>
 </div>
 </section>
+</section>
+<section id="simulated-toys-datasets">
+<h2>Simulated (toys) datasets<a class="headerlink" href="#simulated-toys-datasets" title="Link to this heading">#</a></h2>
 <section id="lingreedy-toy-dataset-500k-interactions-elapsed-time-s-vs-number-of-items">
-<h2>LinGreedy - Toy Dataset (500k Interactions): Elapsed Time (s) vs. Number of Items<a class="headerlink" href="#lingreedy-toy-dataset-500k-interactions-elapsed-time-s-vs-number-of-items" title="Link to this heading">#</a></h2>
+<h3>LinGreedy - Toy Dataset (500k Interactions): Elapsed Time (s) vs. Number of Items<a class="headerlink" href="#lingreedy-toy-dataset-500k-interactions-elapsed-time-s-vs-number-of-items" title="Link to this heading">#</a></h3>
 <img src="_static/items_lingreedy_enhance_and_time.svg" width="75%">
 </section>
 <section id="lingreedy-toy-dataset-500k-interactions-predicted-elapsed-time-s-vs-predicted-number-of-items">
-<h2>LinGreedy - Toy Dataset (500k Interactions): Predicted Elapsed Time (s) vs. Predicted Number of Items<a class="headerlink" href="#lingreedy-toy-dataset-500k-interactions-predicted-elapsed-time-s-vs-predicted-number-of-items" title="Link to this heading">#</a></h2>
+<h3>LinGreedy - Toy Dataset (500k Interactions): Predicted Elapsed Time (s) vs. Predicted Number of Items<a class="headerlink" href="#lingreedy-toy-dataset-500k-interactions-predicted-elapsed-time-s-vs-predicted-number-of-items" title="Link to this heading">#</a></h3>
 <img src="_static/items_lingreedy_pred.svg" width="75%">
+</section>
 <section id="lingreedy-toy-dataset-1k-items-elapsed-time-s-vs-number-of-interactions">
 <h3>LinGreedy - Toy Dataset (1k Items): Elapsed Time (s) vs. Number of Interactions<a class="headerlink" href="#lingreedy-toy-dataset-1k-items-elapsed-time-s-vs-number-of-interactions" title="Link to this heading">#</a></h3>
 <img src="_static/interactions_lingreedy_enhance_and_time.svg" width="75%">
@@ -540,9 +546,13 @@
   </div>
   <nav class="bd-toc-nav page-toc" aria-labelledby="pst-page-navigation-heading-2">
     <ul class="visible nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#movielens-datasets-execution-time-min-and-gobrec-cpu-gpu-speedups-over-mab2rec-and-irec">MovieLens Datasets: Execution Time (min) and GOBRec CPU/GPU Speedups over mab2rec and iRec</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#lingreedy-toy-dataset-500k-interactions-elapsed-time-s-vs-number-of-items">LinGreedy - Toy Dataset (500k Interactions): Elapsed Time (s) vs. Number of Items</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#lingreedy-toy-dataset-500k-interactions-predicted-elapsed-time-s-vs-predicted-number-of-items">LinGreedy - Toy Dataset (500k Interactions): Predicted Elapsed Time (s) vs. Predicted Number of Items</a><ul class="nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#real-datasets">Real Datasets</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#movielens-datasets-execution-time-min-and-gobrec-cpu-gpu-speedups-over-mab2rec-and-irec">MovieLens Datasets: Execution Time (min) and GOBRec CPU/GPU Speedups over mab2rec and iRec</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#simulated-toys-datasets">Simulated (toys) datasets</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#lingreedy-toy-dataset-500k-interactions-elapsed-time-s-vs-number-of-items">LinGreedy - Toy Dataset (500k Interactions): Elapsed Time (s) vs. Number of Items</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#lingreedy-toy-dataset-500k-interactions-predicted-elapsed-time-s-vs-predicted-number-of-items">LinGreedy - Toy Dataset (500k Interactions): Predicted Elapsed Time (s) vs. Predicted Number of Items</a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#lingreedy-toy-dataset-1k-items-elapsed-time-s-vs-number-of-interactions">LinGreedy - Toy Dataset (1k Items): Elapsed Time (s) vs. Number of Interactions</a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#lingreedy-toy-dataset-1k-items-predicted-elapsed-time-s-vs-predicted-number-of-interactions">LinGreedy - Toy Dataset (1k Items): Predicted Elapsed Time (s) vs. Predicted Number of Interactions</a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#linucb-toy-dataset-500k-interactions-elapsed-time-s-vs-number-of-items">LinUCB - Toy Dataset (500k Interactions): Elapsed Time (s) vs. Number of Items</a></li>
