@@ -90,14 +90,14 @@ class LinGreedyMab2RecWrapper(BaseMab2recWrapper):
     """
     Wrapper for the LinGreedy algorithm in MAB2Rec.
     """
-    def __init__(self, context_size: int = None):
-        self.mab2rec_learning_policy = LearningPolicy.LinGreedy(l2_lambda=L2_LAMBDA, epsilon=LINGREEDY_EPSILON)
+    def __init__(self, context_size: int = None, epsilon: float = LINGREEDY_EPSILON):
+        self.mab2rec_learning_policy = LearningPolicy.LinGreedy(l2_lambda=L2_LAMBDA, epsilon=epsilon)
         super().__init__()
 
 class LinTSMab2RecWrapper(BaseMab2recWrapper):
     """
     Wrapper for the LinTS algorithm in MAB2Rec.
     """
-    def __init__(self, context_size: int = None):
-        self.mab2rec_learning_policy = LearningPolicy.LinTS(l2_lambda=L2_LAMBDA, alpha=LINTS_ALPHA)
+    def __init__(self, context_size: int = None, alpha: float = LINTS_ALPHA):
+        self.mab2rec_learning_policy = LearningPolicy.LinTS(l2_lambda=L2_LAMBDA, alpha=alpha)
         super().__init__()

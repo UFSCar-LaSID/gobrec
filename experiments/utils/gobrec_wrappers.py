@@ -81,16 +81,16 @@ class LinGreedyGobrecWrapperCPU(BaseGobrecWrapper):
     """
     Wrapper for the LinGreedy algorithm in GOBRec.
     """
-    def __init__(self, context_size: int = None):
-        self.mab_algo = gobrec.mabs.lin_mabs.LinGreedy(l2_lambda=L2_LAMBDA, epsilon=LINGREEDY_EPSILON, use_gpu=False)
+    def __init__(self, context_size: int = None, epsilon: float = LINGREEDY_EPSILON):
+        self.mab_algo = gobrec.mabs.lin_mabs.LinGreedy(l2_lambda=L2_LAMBDA, epsilon=epsilon, use_gpu=False)
         super().__init__()
 
 class LinTSGobrecWrapperCPU(BaseGobrecWrapper):
     """
     Wrapper for the LinGreedy algorithm in GOBRec.
     """
-    def __init__(self, context_size: int = None):
-        self.mab_algo = gobrec.mabs.lin_mabs.LinTS(l2_lambda=L2_LAMBDA, alpha=LINTS_ALPHA, use_gpu=False)
+    def __init__(self, context_size: int = None, alpha: float = LINTS_ALPHA):
+        self.mab_algo = gobrec.mabs.lin_mabs.LinTS(l2_lambda=L2_LAMBDA, alpha=alpha, use_gpu=False)
         super().__init__()
 
 
@@ -106,14 +106,14 @@ class LinGreedyGobrecWrapperGPU(BaseGobrecWrapper):
     """
     Wrapper for the LinGreedy algorithm in GOBRec.
     """
-    def __init__(self, context_size: int = None):
-        self.mab_algo = gobrec.mabs.lin_mabs.LinGreedy(l2_lambda=L2_LAMBDA, epsilon=LINGREEDY_EPSILON, use_gpu=True, items_per_batch=1_000)
+    def __init__(self, context_size: int = None, epsilon: float = LINGREEDY_EPSILON):
+        self.mab_algo = gobrec.mabs.lin_mabs.LinGreedy(l2_lambda=L2_LAMBDA, epsilon=epsilon, use_gpu=True, items_per_batch=1_000)
         super().__init__()
 
 class LinTSGobrecWrapperGPU(BaseGobrecWrapper):
     """
     Wrapper for the LinGreedy algorithm in GOBRec.
     """
-    def __init__(self, context_size: int = None):
-        self.mab_algo = gobrec.mabs.lin_mabs.LinTS(l2_lambda=L2_LAMBDA, alpha=LINTS_ALPHA, use_gpu=True, items_per_batch=1_000)
+    def __init__(self, context_size: int = None, alpha: float = LINTS_ALPHA):
+        self.mab_algo = gobrec.mabs.lin_mabs.LinTS(l2_lambda=L2_LAMBDA, alpha=alpha, use_gpu=True, items_per_batch=1_000)
         super().__init__()
