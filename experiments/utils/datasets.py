@@ -4,6 +4,7 @@ import pandas as pd
 from utils.generate_toy_datasets import load_or_generate_toy_dataset
 from utils.load_ml_datasets import load_ml100k, load_ml1m, load_ml10m
 from utils.load_delicious2k_dataset import load_delicious2k
+from utils.load_netflixprize_dataset import load_netflixprize
 
 from utils.constants import TOY_DATASETS_SAVE_PATH
 
@@ -36,6 +37,7 @@ DATASETS_TABLE = pd.DataFrame(
      [20,    'ml-100k',                load_ml100k],
      [21,    'ml-1m',                  load_ml1m],
      [22,    'ml-10m',                 load_ml10m],
-     [23,    'delicious2k',            load_delicious2k]],
+     [23,    'netflixprize',           load_netflixprize],
+     [24,    'delicious2k',            load_delicious2k]],
     columns=['id', 'name', 'get_dataset']
 ).set_index('id')
