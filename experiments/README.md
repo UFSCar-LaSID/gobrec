@@ -49,6 +49,7 @@ At the moment, we have benchmarks on [MovieLens](https://grouplens.org/datasets/
 * [MovieLens-100K (ml-100k)](https://grouplens.org/datasets/movielens/100k/): download it and unzip in the `experiments/datasets` folder. You can maintain only the `experiments/datasets/ml-100k/u.data` and `experiments/datasets/ml-100k/u.item` files.
 * [MovieLens-1M (ml-1m)](https://grouplens.org/datasets/movielens/1m/): download it and unzip in the `experiments/datasets` folder. You can maintain only the `experiments/datasets/ml-1m/ratings.dat` and `experiments/datasets/ml-1m/movies.dat` files.
 * [MovieLens-10M (ml-10m)](https://grouplens.org/datasets/movielens/10m/): download it and unzip in the `experiments/datasets` folder. You can maintain only the `experiments/datasets/ml-10m/ratings.dat` and `experiments/datasets/ml-10m/movies.dat` files.
+* [Delicious2K](https://grouplens.org/datasets/hetrec-2011): download `hetrec2011-delicious-2k.zip` in the `Delicious Bookmarks` section and extract it in `experiments/datasets/delicious2k`
 
 ## Executing experiments
 
