@@ -11,6 +11,12 @@ import numpy as np
 from tqdm import tqdm
 from time import time
 
+from multiprocessing import Process
+
+TIMEOUT = 24 * 60 * 60  # 24 hours in seconds
+
+def run_experiment(experiment_function, wrapper, interactions_df, contexts, save_path):
+    experiment_function(wrapper, interactions_df, contexts, save_path)
 
 
 def execute_not_incremental_experiment(wrapper: BaseWrapper, interactions_df: pd.DataFrame, contexts: np.ndarray, save_path: str):
@@ -175,6 +181,18 @@ for dataset_option in datasets_options:
         for experiment_option in experiments_options:
             experiment_name = EXPERIMENTS_TABLE.loc[experiment_option, 'name']
             experiment_function = EXPERIMENTS_TABLE.loc[experiment_option, 'experiment_function']
+
             print(f'Executing experiment {experiment_name} with wrapper {wrapper_name} on dataset {dataset_name}...')
-            experiment_function(wrapper, interactions_df, contexts, get_experiment_save_path(dataset_name, wrapper_name))
+            p = Process(
+                target=run_experiment,
+                args=(experiment_function, wrapper, interactions_df, contexts, get_experiment_save_path(dataset_name, wrapper_name))
+            )
+            p.start()
+            p.join(timeout=TIMEOUT)
+
+            if p.is_alive():
+                print(f"Experiment {experiment_name} exceeded 24 hours. Terminating.")
+                p.terminate()
+                p.join()
+            
             print(f'Experiment {experiment_name} completed.')
