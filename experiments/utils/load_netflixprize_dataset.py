@@ -48,5 +48,3 @@ def load_netflixprize():
     contexts = np.load('./datasets/netflixprize/preprocessed/contexts.npy')
 
     return interactions, contexts
-
-print(load_netflixprize())
