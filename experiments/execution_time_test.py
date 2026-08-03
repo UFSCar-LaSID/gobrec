@@ -1,7 +1,8 @@
 
 from utils.datasets import DATASETS_TABLE
 from utils.wrappers_table import WRAPPERS_TABLE
-from utils.constants import RESULTS_SAVE_PATH, NUM_EXECUTIONS_PER_EXPERIMENT, TRAIN_TIME_COLUMN, RECS_TIME_COLUMN, TOTAL_TIME_COLUMN, CONTEXTS_PER_BATCH, ITEM_ID_COLUMN
+from utils.batch_size_table import BATCH_SIZE_TABLE
+from utils.constants import RESULTS_SAVE_PATH, NUM_EXECUTIONS_PER_EXPERIMENT, TRAIN_TIME_COLUMN, RECS_TIME_COLUMN, TOTAL_TIME_COLUMN, ITEM_ID_COLUMN
 from utils.parameters_handle import get_input
 from utils.BaseWrapper import BaseWrapper
 
@@ -15,11 +16,12 @@ from multiprocessing import Process
 
 TIMEOUT = 24 * 60 * 60  # 24 hours in seconds
 
-def run_experiment(experiment_function, wrapper, interactions_df, contexts, save_path):
-    experiment_function(wrapper, interactions_df, contexts, save_path)
+def run_experiment(experiment_function, wrapper, interactions_df, contexts, save_path, batch_size):
+    experiment_function(wrapper, interactions_df, contexts, save_path, batch_size)
 
 
-def execute_not_incremental_experiment(wrapper: BaseWrapper, interactions_df: pd.DataFrame, contexts: np.ndarray, save_path: str):
+
+def execute_not_incremental_experiment(wrapper: BaseWrapper, interactions_df: pd.DataFrame, contexts: np.ndarray, save_path: str, batch_size: int):
     df_save_path = os.path.join(save_path, 'not_incremental.csv')
     num_necessary_executions = get_num_necessary_executions(df_save_path)
 
@@ -34,16 +36,16 @@ def execute_not_incremental_experiment(wrapper: BaseWrapper, interactions_df: pd
     
     for _ in tqdm(range(num_necessary_executions), desc='Executing not incremental experiment'):
         start_time = time()
-        for start in range(0, len(train_contexts), CONTEXTS_PER_BATCH):
+        for start in range(0, len(train_contexts), batch_size):
             if start == 0:
-                wrapper.fit(train_df[start:start+CONTEXTS_PER_BATCH], train_contexts[start:start+CONTEXTS_PER_BATCH], num_items=num_items)
+                wrapper.fit(train_df[start:start+batch_size], train_contexts[start:start+batch_size], num_items=num_items)
             else:
-                wrapper.partial_fit(train_df[start:start+CONTEXTS_PER_BATCH], train_contexts[start:start+CONTEXTS_PER_BATCH])
+                wrapper.partial_fit(train_df[start:start+batch_size], train_contexts[start:start+batch_size])
         fit_time = time() - start_time
 
         start_time = time()
-        for start in range(0, len(test_contexts), CONTEXTS_PER_BATCH):
-            wrapper.recommend(test_contexts[start:start+CONTEXTS_PER_BATCH])
+        for start in range(0, len(test_contexts), batch_size):
+            wrapper.recommend(test_contexts[start:start+batch_size])
         recommend_time = time() - start_time
 
         full_time = fit_time + recommend_time
@@ -59,7 +61,7 @@ def execute_not_incremental_experiment(wrapper: BaseWrapper, interactions_df: pd
         wrapper.reset()
         
 
-def execute_incremental_experiment(wrapper: BaseWrapper, interactions_df: pd.DataFrame, contexts: np.ndarray, save_path: str):
+def execute_incremental_experiment(wrapper: BaseWrapper, interactions_df: pd.DataFrame, contexts: np.ndarray, save_path: str, batch_size: int):
     NUM_WINDOWS = 10
     df_save_path = os.path.join(save_path, 'incremental.csv')
     num_necessary_executions = get_num_necessary_executions(df_save_path)
@@ -82,11 +84,11 @@ def execute_incremental_experiment(wrapper: BaseWrapper, interactions_df: pd.Dat
 
         start_time = time()
         
-        for start in range(0, len(train_contexts), CONTEXTS_PER_BATCH):
+        for start in range(0, len(train_contexts), batch_size):
             if start == 0:
-                wrapper.fit(train_df[start:start+CONTEXTS_PER_BATCH], train_contexts[start:start+CONTEXTS_PER_BATCH], num_items=num_items)
+                wrapper.fit(train_df[start:start+batch_size], train_contexts[start:start+batch_size], num_items=num_items)
             else:
-                wrapper.partial_fit(train_df[start:start+CONTEXTS_PER_BATCH], train_contexts[start:start+CONTEXTS_PER_BATCH])
+                wrapper.partial_fit(train_df[start:start+batch_size], train_contexts[start:start+batch_size])
         fit_time = time() - start_time
         results[TRAIN_TIME_COLUMN] = fit_time
 
@@ -99,15 +101,15 @@ def execute_incremental_experiment(wrapper: BaseWrapper, interactions_df: pd.Dat
             current_window_contexts = test_contexts[current_window_start_index:current_window_end_index]
 
             start_time = time()
-            for start in range(0, len(current_window_contexts), CONTEXTS_PER_BATCH):
-                wrapper.recommend(current_window_contexts[start:start+CONTEXTS_PER_BATCH])
+            for start in range(0, len(current_window_contexts), batch_size):
+                wrapper.recommend(current_window_contexts[start:start+batch_size])
             recommend_time = time() - start_time
             results[RECS_TIME_COLUMN + f'_{window_number+1}'] = recommend_time
 
             if window_number != NUM_WINDOWS - 1:
                 start_time = time()
-                for start in range(0, len(current_window_df), CONTEXTS_PER_BATCH):
-                    wrapper.partial_fit(current_window_df[start:start+CONTEXTS_PER_BATCH], current_window_contexts[start:start+CONTEXTS_PER_BATCH])
+                for start in range(0, len(current_window_df), batch_size):
+                    wrapper.partial_fit(current_window_df[start:start+batch_size], current_window_contexts[start:start+batch_size])
                 partial_fit_time = time() - start_time
                 results[TRAIN_TIME_COLUMN + f'_{window_number+1}'] = partial_fit_time
 
@@ -126,8 +128,8 @@ def get_num_necessary_executions(file_path: str):
         return NUM_EXECUTIONS_PER_EXPERIMENT - pd.read_csv(file_path).shape[0]
     return NUM_EXECUTIONS_PER_EXPERIMENT
 
-def get_experiment_save_path(dataset_name, wrapper_name):
-    save_path = os.path.join(RESULTS_SAVE_PATH, dataset_name, wrapper_name)
+def get_experiment_save_path(dataset_name, wrapper_name, batch_size_name):
+    save_path = os.path.join(RESULTS_SAVE_PATH, batch_size_name, dataset_name, wrapper_name)
     os.makedirs(save_path, exist_ok=True)
     return save_path
 
@@ -141,9 +143,15 @@ EXPERIMENTS_TABLE = pd.DataFrame(
 ).set_index('id')
 
 
-datasets_options, wrappers_options, experiments_options = get_input(
+batch_size_options, datasets_options, wrappers_options, experiments_options = get_input(
     'Select the options to be used in the experiments',
     [
+        {
+            'name': 'batch_size',
+            'description': 'Batch size',
+            'name_column': 'name',
+            'options': BATCH_SIZE_TABLE
+        },
         {
             'name': 'datasets',
             'description': 'Datasets to be used in the experiments',
@@ -172,27 +180,31 @@ for dataset_option in datasets_options:
     interactions_df, contexts = dataset_getter()
     print(f'Dataset {dataset_name} loaded...')
 
-    for wrapper_option in wrappers_options:
-        wrapper_name = WRAPPERS_TABLE.loc[wrapper_option, 'name']
-        WrapperClass = WRAPPERS_TABLE.loc[wrapper_option, 'AlgoWrapper']
-        print(f'Using wrapper {wrapper_name}...')
-        wrapper = WrapperClass(context_size=contexts.shape[1])
+    for batch_size_option in batch_size_options:
+        batch_size = BATCH_SIZE_TABLE.loc[batch_size_option, 'value']
+        batch_size_name = BATCH_SIZE_TABLE.loc[batch_size_option, 'name']
 
-        for experiment_option in experiments_options:
-            experiment_name = EXPERIMENTS_TABLE.loc[experiment_option, 'name']
-            experiment_function = EXPERIMENTS_TABLE.loc[experiment_option, 'experiment_function']
+        for wrapper_option in wrappers_options:
+            wrapper_name = WRAPPERS_TABLE.loc[wrapper_option, 'name']
+            WrapperClass = WRAPPERS_TABLE.loc[wrapper_option, 'AlgoWrapper']
+            print(f'Using wrapper {wrapper_name}...')
+            wrapper = WrapperClass(context_size=contexts.shape[1])
 
-            print(f'Executing experiment {experiment_name} with wrapper {wrapper_name} on dataset {dataset_name}...')
-            p = Process(
-                target=run_experiment,
-                args=(experiment_function, wrapper, interactions_df, contexts, get_experiment_save_path(dataset_name, wrapper_name))
-            )
-            p.start()
-            p.join(timeout=TIMEOUT)
+            for experiment_option in experiments_options:
+                experiment_name = EXPERIMENTS_TABLE.loc[experiment_option, 'name']
+                experiment_function = EXPERIMENTS_TABLE.loc[experiment_option, 'experiment_function']
 
-            if p.is_alive():
-                print(f"Experiment {experiment_name} exceeded 24 hours. Terminating.")
-                p.terminate()
-                p.join()
-            
-            print(f'Experiment {experiment_name} completed.')
+                print(f'Executing experiment {experiment_name} with wrapper {wrapper_name} on dataset {dataset_name}...')
+                p = Process(
+                    target=run_experiment,
+                    args=(experiment_function, wrapper, interactions_df, contexts, get_experiment_save_path(dataset_name, wrapper_name, batch_size_name), batch_size)
+                )
+                p.start()
+                p.join(timeout=TIMEOUT)
+
+                if p.is_alive():
+                    print(f"Experiment {experiment_name} exceeded 24 hours. Terminating.")
+                    p.terminate()
+                    p.join()
+                
+                print(f'Experiment {experiment_name} completed.')

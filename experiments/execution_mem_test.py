@@ -8,14 +8,15 @@ from multiprocessing import Process, Queue
 
 from utils.datasets import DATASETS_TABLE
 from utils.wrappers_table import WRAPPERS_TABLE
+from utils.batch_size_table import BATCH_SIZE_TABLE
 from utils.constants import (
     RESULTS_SAVE_PATH,
     NUM_EXECUTIONS_PER_EXPERIMENT,
-    CONTEXTS_PER_BATCH,
     ITEM_ID_COLUMN
 )
 from utils.parameters_handle import get_input
 from utils.BaseWrapper import BaseWrapper
+import resource
 
 
 def get_memory_usage_mb():
@@ -23,7 +24,7 @@ def get_memory_usage_mb():
     return process.memory_info().rss / (1024 ** 2)
 
 
-def memory_experiment_worker(wrapper_class: BaseWrapper, context_size: int, interactions_df: pd.DataFrame, contexts: np.ndarray, queue):
+def memory_experiment_worker(wrapper_class: BaseWrapper, context_size: int, interactions_df: pd.DataFrame, contexts: np.ndarray, queue, batch_size: int):
     gc.collect()
 
     wrapper = wrapper_class(context_size=context_size)
@@ -33,25 +34,31 @@ def memory_experiment_worker(wrapper_class: BaseWrapper, context_size: int, inte
 
     train_df = interactions_df[:split_index]
     train_contexts = contexts[:split_index]
+    test_contexts = contexts[split_index:]
 
-    for start in range(0, len(train_contexts), CONTEXTS_PER_BATCH):
+    for start in range(0, len(train_contexts), batch_size):
         if start == 0:
             wrapper.fit(
-                train_df[start:start + CONTEXTS_PER_BATCH],
-                train_contexts[start:start + CONTEXTS_PER_BATCH],
+                train_df[start:start + batch_size],
+                train_contexts[start:start + batch_size],
                 num_items=num_items
             )
         else:
             wrapper.partial_fit(
-                train_df[start:start + CONTEXTS_PER_BATCH],
-                train_contexts[start:start + CONTEXTS_PER_BATCH]
+                train_df[start:start + batch_size],
+                train_contexts[start:start + batch_size]
             )
+
+    for start in range(0, len(test_contexts), batch_size):
+        wrapper.recommend(test_contexts[start:start+batch_size])
 
     gc.collect()
 
     memory_used = get_memory_usage_mb()
+    peak_memory = resource.getrusage(resource.RUSAGE_SELF).ru_maxrss / 1024
 
     queue.put(memory_used)
+    queue.put(peak_memory)
 
 
 def execute_memory_experiment(wrapper_class, interactions_df, contexts, save_path):
@@ -68,14 +75,15 @@ def execute_memory_experiment(wrapper_class, interactions_df, contexts, save_pat
 
         p = Process(
             target=memory_experiment_worker,
-            args=(wrapper_class, contexts.shape[1], interactions_df, contexts, queue)
+            args=(wrapper_class, contexts.shape[1], interactions_df, contexts, queue, batch_size)
         )
         p.start()
         p.join()
 
         memory_used = queue.get()
-
-        results_df = pd.DataFrame([{"memory_mb": memory_used}])
+        peak_memory = queue.get()
+        
+        results_df = pd.DataFrame([{"memory_mb": memory_used, "peak_memory_mb": peak_memory}])
         results_df.to_csv(
             df_save_path,
             mode='a',
@@ -84,15 +92,21 @@ def execute_memory_experiment(wrapper_class, interactions_df, contexts, save_pat
         )
 
 
-def get_experiment_save_path(dataset_name, wrapper_name):
-    save_path = os.path.join(RESULTS_SAVE_PATH, dataset_name, wrapper_name)
+def get_experiment_save_path(dataset_name, wrapper_name, batch_size_name):
+    save_path = os.path.join(RESULTS_SAVE_PATH, batch_size_name, dataset_name, wrapper_name)
     os.makedirs(save_path, exist_ok=True)
     return save_path
 
 
-datasets_options, wrappers_options = get_input(
+batch_size_options, datasets_options, wrappers_options = get_input(
     'Select datasets and algorithms',
     [
+        {
+            'name': 'batch_size',
+            'description': 'Batch size',
+            'name_column': 'name',
+            'options': BATCH_SIZE_TABLE
+        },
         {
             'name': 'datasets',
             'description': 'Datasets to be used',
@@ -117,15 +131,19 @@ for dataset_option in datasets_options:
     interactions_df, contexts = dataset_getter()
     print(f'Dataset {dataset_name} loaded.')
 
-    for wrapper_option in wrappers_options:
-        wrapper_name = WRAPPERS_TABLE.loc[wrapper_option, 'name']
-        WrapperClass = WRAPPERS_TABLE.loc[wrapper_option, 'AlgoWrapper']
+    for batch_size_option in BATCH_SIZE_TABLE.index:
+        batch_size = BATCH_SIZE_TABLE.loc[batch_size_option, 'value']
+        batch_size_name = BATCH_SIZE_TABLE.loc[batch_size_option, 'name']
 
-        print(f'Running memory experiment for {wrapper_name} on {dataset_name}...')
-        execute_memory_experiment(
-            WrapperClass,
-            interactions_df,
-            contexts,
-            get_experiment_save_path(dataset_name, wrapper_name)
-        )
-        print('Done.')
+        for wrapper_option in wrappers_options:
+            wrapper_name = WRAPPERS_TABLE.loc[wrapper_option, 'name']
+            WrapperClass = WRAPPERS_TABLE.loc[wrapper_option, 'AlgoWrapper']
+
+            print(f'Running memory experiment for {wrapper_name} on {dataset_name}...')
+            execute_memory_experiment(
+                WrapperClass,
+                interactions_df,
+                contexts,
+                get_experiment_save_path(dataset_name, wrapper_name, batch_size_name)
+            )
+            print('Done.')
