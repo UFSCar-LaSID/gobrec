@@ -4,7 +4,8 @@ import psutil
 import pandas as pd
 import numpy as np
 from tqdm import tqdm
-from multiprocessing import Process, Queue
+from multiprocessing import Process, Pipe
+import time
 
 from utils.datasets import DATASETS_TABLE
 from utils.wrappers_table import WRAPPERS_TABLE
@@ -24,41 +25,61 @@ def get_memory_usage_mb():
     return process.memory_info().rss / (1024 ** 2)
 
 
-def memory_experiment_worker(wrapper_class: BaseWrapper, context_size: int, interactions_df: pd.DataFrame, contexts: np.ndarray, queue, batch_size: int):
-    gc.collect()
+def memory_experiment_worker(
+    wrapper_class,
+    context_size,
+    interactions_df,
+    contexts,
+    conn,
+    batch_size
+):
+    try:
+        gc.collect()
 
-    wrapper = wrapper_class(context_size=context_size)
+        wrapper = wrapper_class(context_size=context_size)
 
-    num_items = interactions_df[ITEM_ID_COLUMN].nunique()
-    split_index = int(len(interactions_df) * 0.5)
+        num_items = interactions_df[ITEM_ID_COLUMN].nunique()
+        split_index = int(len(interactions_df) * 0.5)
 
-    train_df = interactions_df[:split_index]
-    train_contexts = contexts[:split_index]
-    test_contexts = contexts[split_index:]
+        train_df = interactions_df[:split_index]
+        train_contexts = contexts[:split_index]
+        test_contexts = contexts[split_index:]
 
-    for start in range(0, len(train_contexts), batch_size):
-        if start == 0:
-            wrapper.fit(
-                train_df[start:start + batch_size],
-                train_contexts[start:start + batch_size],
-                num_items=num_items
+        start_time = time.time()
+
+        for start in range(0, len(train_contexts), batch_size):
+            if start == 0:
+                wrapper.fit(
+                    train_df[start:start + batch_size],
+                    train_contexts[start:start + batch_size],
+                    num_items=num_items
+                )
+            else:
+                wrapper.partial_fit(
+                    train_df[start:start + batch_size],
+                    train_contexts[start:start + batch_size]
+                )
+
+        for start in range(0, len(test_contexts), batch_size):
+            wrapper.recommend(
+                test_contexts[start:start + batch_size]
             )
-        else:
-            wrapper.partial_fit(
-                train_df[start:start + batch_size],
-                train_contexts[start:start + batch_size]
-            )
 
-    for start in range(0, len(test_contexts), batch_size):
-        wrapper.recommend(test_contexts[start:start+batch_size])
+        gc.collect()
 
-    gc.collect()
+        memory_used = get_memory_usage_mb()
+        peak_memory = resource.getrusage(
+            resource.RUSAGE_SELF
+        ).ru_maxrss / 1024
+        time_spent = time.time() - start_time
 
-    memory_used = get_memory_usage_mb()
-    peak_memory = resource.getrusage(resource.RUSAGE_SELF).ru_maxrss / 1024
+        conn.send(("success", memory_used, peak_memory, time_spent))
 
-    queue.put(memory_used)
-    queue.put(peak_memory)
+    except Exception as e:
+        conn.send(("error", repr(e)))
+
+    finally:
+        conn.close()
 
 
 def execute_memory_experiment(wrapper_class, interactions_df, contexts, save_path):
@@ -71,19 +92,45 @@ def execute_memory_experiment(wrapper_class, interactions_df, contexts, save_pat
     num_runs = NUM_EXECUTIONS_PER_EXPERIMENT - existing_runs
 
     for _ in tqdm(range(num_runs), desc='Executing memory experiment'):
-        queue = Queue()
+        parent_conn, child_conn = Pipe()
 
         p = Process(
             target=memory_experiment_worker,
-            args=(wrapper_class, contexts.shape[1], interactions_df, contexts, queue, batch_size)
+            args=(
+                wrapper_class,
+                contexts.shape[1],
+                interactions_df,
+                contexts,
+                child_conn,
+                batch_size
+            )
         )
+
         p.start()
+
+        while True:
+            if parent_conn.poll(1):
+                status, *result = parent_conn.recv()
+                break
+
+            if not p.is_alive():
+                print(
+                    f"Worker terminated unexpectedly. "
+                    f"Exit code: {p.exitcode}"
+                )
+
+                raise RuntimeError(
+                    f"Worker died with exit code {p.exitcode}"
+                )
+
         p.join()
 
-        memory_used = queue.get()
-        peak_memory = queue.get()
+        if status == "error":
+            raise RuntimeError(result[0])
+
+        memory_used, peak_memory, time_spent = result
         
-        results_df = pd.DataFrame([{"memory_mb": memory_used, "peak_memory_mb": peak_memory}])
+        results_df = pd.DataFrame([{"memory_mb": memory_used, "peak_memory_mb": peak_memory, "time": time_spent}])
         results_df.to_csv(
             df_save_path,
             mode='a',
@@ -131,7 +178,7 @@ for dataset_option in datasets_options:
     interactions_df, contexts = dataset_getter()
     print(f'Dataset {dataset_name} loaded.')
 
-    for batch_size_option in BATCH_SIZE_TABLE.index:
+    for batch_size_option in batch_size_options:
         batch_size = BATCH_SIZE_TABLE.loc[batch_size_option, 'value']
         batch_size_name = BATCH_SIZE_TABLE.loc[batch_size_option, 'name']
 
@@ -139,7 +186,7 @@ for dataset_option in datasets_options:
             wrapper_name = WRAPPERS_TABLE.loc[wrapper_option, 'name']
             WrapperClass = WRAPPERS_TABLE.loc[wrapper_option, 'AlgoWrapper']
 
-            print(f'Running memory experiment for {wrapper_name} on {dataset_name}...')
+            print(f'Running memory experiment for {wrapper_name} on {dataset_name} with batch size {batch_size_name}...')
             execute_memory_experiment(
                 WrapperClass,
                 interactions_df,
