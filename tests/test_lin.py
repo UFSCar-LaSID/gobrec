@@ -3,7 +3,7 @@ import gobrec
 import numpy as np
 
 
-def test_lin_prediction_one_arm():
+def test_predict_one_arm():
     contexts = np.array([[1, 0, 2, 1, 1], [3, 1, 2, 3, 4], [2, -1, 1, 0, 2]])
     decisions = np.array([0, 0, 0])
     rewards = np.array([3, 3, 1])
