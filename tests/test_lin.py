@@ -211,3 +211,256 @@ def test_incremental_vs_full_fit():
         lin_inc.A.cpu().numpy(),
         atol=1e-8,
     )
+
+def test_incremental_different_order():
+    contexts1 = np.array([[1, 0, 0, 0, 1], [0, 1, 2, 3, 4], [2, 0, 1, 0, 2]])
+    rewards1 = np.array([0, 1, 1])
+    decisions1 = np.array([1, 1, 1])
+
+    contexts2 = np.array([[2, 1, 2, 1, 2],[3, 3, 3, 2, 1],[1, 1, 1, 1, 1]])
+    rewards2 = np.array([0, 1, 0])
+    decisions2 = np.array([0, 0, 1])
+
+    lin12 = gobrec.mabs.lin_mabs.Lin(
+        l2_lambda=1.0,
+        use_gpu=False,
+    )
+    lin12.fit(
+        contexts1,
+        decisions1,
+        rewards1,
+    )
+    lin12.fit(
+        contexts2,
+        decisions2,
+        rewards2,
+    )
+
+    lin21 = gobrec.mabs.lin_mabs.Lin(
+        l2_lambda=1.0,
+        use_gpu=False,
+    )
+    lin21.fit(
+        contexts2,
+        decisions2,
+        rewards2,
+    )
+    lin21.fit(
+        contexts1,
+        decisions1,
+        rewards1,
+    )
+
+    # The label encoding depends on the order in which arms are first seen.
+    # Therefore, compare the models using the original arm IDs rather than
+    # directly comparing the encoded rows.
+
+    for arm in [0,1]:
+        idx12 = lin12.label_encoder.transform(np.array([arm]))[0]
+        idx21 = lin21.label_encoder.transform(np.array([arm]))[0]
+
+        assert np.allclose(
+            lin12.beta[idx12].cpu().numpy(),
+            lin21.beta[idx21].cpu().numpy(),
+            atol=1e-8,
+        )
+
+        assert np.allclose(
+            lin12.A[idx12].cpu().numpy(),
+            lin21.A[idx21].cpu().numpy(),
+            atol=1e-8,
+        )
+
+        assert np.allclose(
+            lin12.Xty[idx12].cpu().numpy(),
+            lin21.Xty[idx21].cpu().numpy(),
+            atol=1e-8,
+        )
+    
+def test_batch_vs_3_incremental_fit():
+    contexts = np.array([
+        [1, 0, 0, 0, 1],[0, 1, 2, 3, 4],[2, 0, 1, 0, 2],
+        [2, 1, 2, 1, 2],[3, 3, 3, 2, 1],[1, 1, 1, 1, 1],
+        [1, 2, 0, 1, 3],[2, 2, 1, 0, 1],[3, 0, 2, 1, 2],
+    ])
+    rewards = np.array([
+        0, 1, 1,
+        0, 1, 0,
+        1, 0, 1,
+    ])
+    decisions = np.array([
+        1, 1, 1,
+        0, 0, 1,
+        0, 1, 0,
+    ])
+
+    lin_batch = gobrec.mabs.lin_mabs.Lin(
+        l2_lambda=1.0,
+        use_gpu=False,
+    )
+
+    lin_batch.fit(
+        contexts,
+        decisions,
+        rewards,
+    )
+
+
+
+    lin_incremental = gobrec.mabs.lin_mabs.Lin(
+        l2_lambda=1.0,
+        use_gpu=False,
+    )
+
+    lin_incremental.fit(
+        contexts[:3],
+        decisions[:3],
+        rewards[:3],
+    )
+    lin_incremental.fit(
+        contexts[3:6],
+        decisions[3:6],
+        rewards[3:6],
+    )
+    lin_incremental.fit(
+        contexts[6:],
+        decisions[6:],
+        rewards[6:],
+    )
+
+
+    assert np.array_equal(
+        lin_batch.label_encoder.classes_,
+        lin_incremental.label_encoder.classes_,
+    )
+
+
+    assert np.allclose(
+        lin_batch.A.cpu().numpy(),
+        lin_incremental.A.cpu().numpy(),
+        atol=1e-8,
+    )
+
+    assert np.allclose(
+        lin_batch.Xty.cpu().numpy(),
+        lin_incremental.Xty.cpu().numpy(),
+        atol=1e-8,
+    )
+
+    assert np.allclose(
+        lin_batch.beta.cpu().numpy(),
+        lin_incremental.beta.cpu().numpy(),
+        atol=1e-8,
+    )
+
+    test_contexts = np.array([[1, 2, 3, 4, 5],[5, 4, 3, 2, 1],[0, 1, 0, 1, 0]])
+
+    pred_batch = lin_batch.predict(test_contexts)
+    pred_incremental = lin_incremental.predict(test_contexts)
+
+    assert np.allclose(
+        pred_batch.cpu().numpy(),
+        pred_incremental.cpu().numpy(),
+        atol=1e-8,
+    )
+
+def test_l2_low():
+    context = np.array([[1, 1, 0, 0, 1],[0, 1, 2, 9, 4],[2, 3, 1, 0, 2]])
+    rewards = np.array([3, 2, 1])
+    decisions = np.array([1, 1, 1])
+
+    lin = gobrec.mabs.lin_mabs.Lin(
+        l2_lambda=0.1,
+        use_gpu=False,
+    )
+
+    lin.fit(context, decisions, rewards)
+
+    assert lin.num_features == 5
+    assert lin.num_arms == 1
+
+    expected_beta = np.array([
+        1.59499705,
+        -0.91856183,
+        -2.49775977,
+        0.14219195,
+        1.65819347,
+    ])
+
+    assert np.allclose(
+        lin.beta[0].cpu().numpy(),
+        expected_beta,
+        atol=1e-8,
+    )
+
+def test_l2_high():
+    context = np.array([[1, 1, 0, 0, 1],[0, 1, 2, 9, 4],[2, 3, 1, 0, 2]])
+    rewards = np.array([3, 2, 1])
+    decisions = np.array([1, 1, 1])
+
+    lin = gobrec.mabs.lin_mabs.Lin(
+        l2_lambda=10,
+        use_gpu=False,
+    )
+
+    lin.fit(context, decisions, rewards)
+
+    assert lin.num_features == 5
+    assert lin.num_arms == 1
+
+    expected_beta = np.array([
+        0.18310155,
+        0.16372811,
+        -0.00889076,
+        0.09434416,
+        0.22503229,
+    ])
+
+    assert np.allclose(
+        lin.beta[0].cpu().numpy(),
+        expected_beta,
+        atol=1e-8,
+    )
+
+import gobrec
+import numpy as np
+
+
+def test_l2_0():
+    context = np.array([[1, 0, 2, 1, 1], [3, 1, 2, 3, 4], [2, -1, 1, 0, 2], [-1, 4, 2, 0, 1],
+                        [2, 2, 2, 2, 2], [3, 2, 1, 2, 3], [0, 0, 0, 0, 0], [2, 1, 1, 1, 2],
+                        [3, 2, 3, 2, 3], [8, 2, 3, 1, 0], [1, 2, -9, -7, 1], [0, 1, 1, 1, 1]])
+    rewards = np.array([
+        3, 3, 1, 0, 
+        -1, 2, 1, 2, 
+        1, 1, 0, 3,
+    ])
+    decisions = np.array([
+        1, 1, 1, 1, 
+        1, 1, 1, 1, 
+        1, 1, 1, 1,
+    ])
+
+    lin = gobrec.mabs.lin_mabs.Lin(
+        l2_lambda=0,
+        use_gpu=False,
+    )
+
+    lin.fit(context, decisions, rewards)
+
+    assert lin.num_features == 5
+    assert lin.num_arms == 1
+
+    expected_beta = np.array([
+        0.09224215,
+        -0.20569848,
+        0.13434242,
+        -0.10000450,
+        0.63726682,
+    ])
+
+    assert np.allclose(
+        lin.beta[0].cpu().numpy(),
+        expected_beta,
+        atol=1e-8,
+    )
