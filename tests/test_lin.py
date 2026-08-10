@@ -422,10 +422,6 @@ def test_l2_high():
         atol=1e-8,
     )
 
-import gobrec
-import numpy as np
-
-
 def test_l2_0():
     context = np.array([[1, 0, 2, 1, 1], [3, 1, 2, 3, 4], [2, -1, 1, 0, 2], [-1, 4, 2, 0, 1],
                         [2, 2, 2, 2, 2], [3, 2, 1, 2, 3], [0, 0, 0, 0, 0], [2, 1, 1, 1, 2],
