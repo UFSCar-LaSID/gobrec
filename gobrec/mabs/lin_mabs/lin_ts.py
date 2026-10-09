@@ -77,6 +77,9 @@ class LinTS(Lin):
         """
         super().__init__(seed, l2_lambda, use_gpu, items_per_batch)
         self.alpha = alpha
+
+        if self.alpha == 0:
+            self.predict = super().predict
     
     def predict(self, contexts: np.ndarray):
         """Predict the expected rewards for each arm given the contexts.
