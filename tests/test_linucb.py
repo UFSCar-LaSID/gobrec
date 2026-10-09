@@ -1,5 +1,14 @@
 
+
+import os
+import sys
+
+local_path = os.path.abspath(
+    os.path.join(os.path.dirname(__file__), "..")
+)
+sys.path.insert(0, local_path)
 import gobrec
+
 import numpy as np
 import datetime
 
