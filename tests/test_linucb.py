@@ -11,6 +11,26 @@ import gobrec
 
 import numpy as np
 import datetime
+import torch
+import pytest
+
+
+
+
+@pytest.fixture(params=[False, True], ids=["cpu", "gpu"])
+def lin_ucb_factory(request):
+    use_gpu = request.param
+
+    if use_gpu and not torch.cuda.is_available():
+        pytest.skip("CUDA is not available")
+
+    def create_linucb(**kwargs):
+        return gobrec.mabs.lin_mabs.LinUCB(
+            use_gpu=use_gpu,
+            **kwargs,
+        )
+
+    return create_linucb
 
 def get_best_arms(linucb, contexts):
     pred = linucb.predict(contexts).cpu().numpy()
@@ -20,7 +40,7 @@ def get_best_arms(linucb, contexts):
 
 
 
-def test_alpha0():
+def test_alpha0(lin_ucb_factory):
     contexts = np.array([
         [0, 1, 2, 3, 5], [1, 1, 1, 1, 1], [0, 0, 1, 0, 0], [0, 2, 2, 3, 5], [1, 3, 1, 1, 1], 
         [0, 0, 0, 0, 0], [0, 1, 4, 3, 5], [0, 1, 2, 4, 5], [1, 2, 1, 1, 3], [0, 2, 1, 0, 0]
@@ -34,7 +54,7 @@ def test_alpha0():
         0, 1, 1, 1, 1
     ])
 
-    linucb = gobrec.mabs.lin_mabs.LinUCB(alpha=0.0, use_gpu=False)
+    linucb = lin_ucb_factory(alpha=0.0)
 
     linucb.fit(contexts, decisions, rewards)
     
@@ -52,7 +72,7 @@ def test_alpha0():
     assert np.allclose(pred, expected)
 
 
-def test_alpha1():
+def test_alpha1(lin_ucb_factory):
     contexts = np.array([
         [0, 1, 2, 3, 5],[1, 1, 1, 1, 1],[0, 0, 1, 0, 0],[0, 2, 2, 3, 5],[1, 3, 1, 1, 1],
         [0, 0, 0, 0, 0],[0, 1, 4, 3, 5],[0, 1, 2, 4, 5],[1, 2, 1, 1, 3],[0, 2, 1, 0, 0],
@@ -68,7 +88,7 @@ def test_alpha1():
         0, 0, 1, 1, 1,
     ])
 
-    linucb = gobrec.mabs.lin_mabs.LinUCB(alpha=1.0, use_gpu=False)
+    linucb = lin_ucb_factory(alpha=1.0)
 
     linucb.fit(contexts, decisions, rewards)
 
@@ -90,7 +110,7 @@ def test_alpha1():
     assert pred.shape == (2, 3)
     assert np.allclose(pred, expected)
 
-def test_linucb_t1():
+def test_linucb_t1(lin_ucb_factory):
     contexts = np.array([
         [0, 1, 2, 3, 5],[1, 1, 1, 1, 1],[0, 0, 1, 0, 0],[0, 2, 2, 3, 5],[1, 3, 1, 1, 1],
         [0, 0, 0, 0, 0],[0, 1, 4, 3, 5], [0, 1, 2, 4, 5], [1, 2, 1, 1, 3],[0, 2, 1, 0, 0]
@@ -106,7 +126,7 @@ def test_linucb_t1():
         0, 1, 1, 1, 1
     ])
 
-    linucb = gobrec.mabs.lin_mabs.LinUCB(alpha=0.24, use_gpu=False)
+    linucb = lin_ucb_factory(alpha=0.24)
 
     linucb.fit(contexts, decisions, rewards)
 
@@ -122,7 +142,7 @@ def test_linucb_t1():
     assert pred.shape == (2, 3)
     assert (best_arms == np.array([2, 1])).all()
 
-def test_linucb_t2():
+def test_linucb_t2(lin_ucb_factory):
     contexts = np.array([
         [0, 1, 2, 3, 5], [1, 1, 1, 1, 1], [0, 0, 1, 0, 0], [0, 2, 2, 3, 5], [1, 3, 1, 1, 1],
         [0, 0, 0, 0, 0], [0, 1, 4, 3, 5], [0, 1, 2, 4, 5], [1, 2, 1, 1, 3], [0, 2, 1, 0, 0]
@@ -138,7 +158,7 @@ def test_linucb_t2():
         0, 1, 1, 1, 1
     ])
 
-    linucb = gobrec.mabs.lin_mabs.LinUCB(alpha=1.5, use_gpu=False)
+    linucb = lin_ucb_factory(alpha=1.5)
 
     linucb.fit(contexts, decisions, rewards)
 
@@ -155,7 +175,7 @@ def test_linucb_t2():
     assert pred.shape == (2, 3)
     assert (best_arms == np.array([2, 2])).all()
 
-def test_linucb_t3():
+def test_linucb_t3(lin_ucb_factory):
     contexts = np.array([
         [0, 1, 2, 3, 5], [1, 1, 1, 1, 1], [0, 0, 1, 0, 0], [0, 2, 2, 3, 5], [1, 3, 1, 1, 1],
         [0, 0, 0, 0, 0], [0, 1, 4, 3, 5], [0, 1, 2, 4, 5], [1, 2, 1, 1, 3], [0, 2, 1, 0, 0],
@@ -177,7 +197,7 @@ def test_linucb_t3():
         1
     ])
 
-    linucb = gobrec.mabs.lin_mabs.LinUCB(alpha=1.25, use_gpu=False)
+    linucb = lin_ucb_factory(alpha=1.25)
 
     linucb.fit(contexts, decisions, rewards)
 
@@ -194,7 +214,7 @@ def test_linucb_t3():
     assert pred.shape == (2, 3)
     assert (best_arms == np.array([4, 4])).all()
 
-def test_linucb_t4():
+def test_linucb_t4(lin_ucb_factory):
     contexts = np.array([
         [0, 1, 2, 3, 5], [1, 1, 1, 1, 1], [0, 0, 1, 0, 0], [0, 2, 2, 3, 5], [1, 3, 1, 1, 1],
         [0, 0, 0, 0, 0], [0, 1, 4, 3, 5], [0, 1, 2, 4, 5], [1, 2, 1, 1, 3], [0, 2, 1, 0, 0],
@@ -216,7 +236,7 @@ def test_linucb_t4():
         1
     ])
 
-    linucb = gobrec.mabs.lin_mabs.LinUCB(alpha=2.0, use_gpu=False)
+    linucb = lin_ucb_factory(alpha=2.0)
 
     linucb.fit(contexts, decisions, rewards)
 
@@ -233,7 +253,7 @@ def test_linucb_t4():
     assert pred.shape == (2, 3)
     assert (best_arms == np.array([4, 4])).all()
 
-def test_linucb_t5():
+def test_linucb_t5(lin_ucb_factory):
     contexts = np.array([
         [0, 1, 2, 3, 5], [1, 1, 1, 1, 1], [0, 0, 1, 0, 0], [0, 2, 2, 3, 5], [1, 3, 1, 1, 1],
         [0, 0, 0, 0, 0], [0, 1, 4, 3, 5], [0, 1, 2, 4, 5], [1, 2, 1, 1, 3], [0, 2, 1, 0, 0]
@@ -249,7 +269,7 @@ def test_linucb_t5():
         0, 1, 1, 1, 0
     ])
 
-    linucb = gobrec.mabs.lin_mabs.LinUCB(alpha=1.0, use_gpu=False)
+    linucb = lin_ucb_factory(alpha=1.0)
 
     linucb.fit(contexts, decisions, rewards)
 
@@ -266,7 +286,7 @@ def test_linucb_t5():
     assert pred.shape == (2, 3)
     assert (best_arms == np.array(["two", "two"])).all()
 
-def test_linucb_t6():
+def test_linucb_t6(lin_ucb_factory):
     contexts = np.array([
         [0, 1, 2, 3, 5], [1, 1, 1, 1, 1], [0, 0, 1, 0, 0], [0, 2, 2, 3, 5], [1, 3, 1, 1, 1],
         [0, 0, 0, 0, 0], [0, 1, 4, 3, 5], [0, 1, 2, 4, 5], [1, 2, 1, 1, 3], [0, 2, 1, 0, 0],
@@ -285,7 +305,7 @@ def test_linucb_t6():
         1
     ])
 
-    linucb = gobrec.mabs.lin_mabs.LinUCB(alpha=1.25, use_gpu=False)
+    linucb = lin_ucb_factory(alpha=1.25)
 
     linucb.fit(contexts, decisions, rewards)
 
@@ -302,7 +322,7 @@ def test_linucb_t6():
     assert pred.shape == (2, 3)
     assert (best_arms == np.array(["three", "one"])).all()
 
-def test_linucb_t8():
+def test_linucb_t8(lin_ucb_factory):
     contexts = np.array([
         [0, 1, 2, 3, 5], [1, 1, 1, 1, 1], [0, 0, 1, 0, 0], [0, 2, 2, 3, 5], [1, 3, 1, 1, 1],
         [0, 0, 0, 0, 0], [0, 1, 4, 3, 5], [0, 1, 2, 4, 5], [1, 2, 1, 1, 3], [0, 2, 1, 0, 0]
@@ -318,7 +338,7 @@ def test_linucb_t8():
         9.2, -1, -10, 4, 0
     ])
 
-    linucb = gobrec.mabs.lin_mabs.LinUCB(alpha=0.5, use_gpu=False)
+    linucb = lin_ucb_factory(alpha=0.5)
 
     linucb.fit(contexts, decisions, rewards)
 
@@ -335,7 +355,7 @@ def test_linucb_t8():
     assert pred.shape == (2, 3)
     assert (best_arms == np.array(["c", "c"])).all()
 
-def test_linucb_t9():
+def test_linucb_t9(lin_ucb_factory):
     contexts = np.array([
         [0, 1, 2, 3, 5], [1, 1, 1, 1, 1], [0, 0, 1, 0, 0], [0, 2, 2, 3, 5], [1, 3, 1, 1, 1],
         [0, 0, 0, 0, 0], [0, 1, 4, 3, 5], [0, 1, 2, 4, 5], [1, 2, 1, 1, 3], [0, 2, 1, 0, 0]
@@ -352,7 +372,7 @@ def test_linucb_t9():
         0.2, -1, -10, 4, 0
     ])
 
-    linucb = gobrec.mabs.lin_mabs.LinUCB(alpha=0.25, use_gpu=False)
+    linucb = lin_ucb_factory(alpha=0.25)
 
     linucb.fit(contexts, decisions, rewards)
 
@@ -369,7 +389,7 @@ def test_linucb_t9():
     assert pred.shape == (2, 3)
     assert (best_arms == np.array([c, c], dtype=object)).all()
 
-def test_linucb_t10():
+def test_linucb_t10(lin_ucb_factory):
     contexts = np.array([
         [0, 1, 2, 3, 5], [1, 1, 1, 1, 1], [0, 0, 1, 0, 0], [0, 2, 2, 3, 5], [1, 3, 1, 1, 1],
         [0, 0, 0, 0, 0], [0, 1, 4, 3, 5], [0, 1, 2, 4, 5], [1, 2, 1, 1, 3], [0, 2, 1, 0, 0],
@@ -392,7 +412,7 @@ def test_linucb_t10():
         6, 7, 1
     ])
 
-    linucb = gobrec.mabs.lin_mabs.LinUCB(alpha=1.0, use_gpu=False)
+    linucb = lin_ucb_factory(alpha=1.0)
 
     linucb.fit(contexts, decisions, rewards)
 
@@ -409,7 +429,7 @@ def test_linucb_t10():
     assert pred.shape == (2, 3)
     assert (best_arms == np.array([b, b], dtype=object)).all()
 
-def test_fit():
+def test_fit(lin_ucb_factory):
     contexts = np.array([
         [0, 1, 2, 3, 5], [1, 1, 1, 1, 1], [0, 0, 1, 0, 0], [0, 2, 2, 3, 5], [1, 3, 1, 1, 1],
         [0, 0, 0, 0, 0], [0, 1, 4, 3, 5], [0, 1, 2, 4, 5], [1, 2, 1, 1, 3], [0, 2, 1, 0, 0]
@@ -425,7 +445,7 @@ def test_fit():
         0, 0, 1, 1, 1
     ])
 
-    linucb = gobrec.mabs.lin_mabs.LinUCB(alpha=1.0, use_gpu=False)
+    linucb = lin_ucb_factory(alpha=1.0)
 
     linucb.fit(contexts, decisions, rewards)
 
@@ -437,7 +457,7 @@ def test_fit():
 
 
 
-def test_partial_fit():
+def test_partial_fit(lin_ucb_factory):
     contexts = np.array([
         [0, 1, 2, 3, 5], [1, 1, 1, 1, 1], [0, 0, 1, 0, 0], [0, 2, 2, 3, 5], [1, 3, 1, 1, 1],
         [0, 0, 0, 0, 0], [0, 1, 4, 3, 5], [0, 1, 2, 4, 5], [1, 2, 1, 1, 3], [0, 2, 1, 0, 0]
@@ -453,7 +473,7 @@ def test_partial_fit():
         0, 0, 1, 1, 1
     ])
 
-    linucb = gobrec.mabs.lin_mabs.LinUCB(alpha=1.0, use_gpu=False)
+    linucb = lin_ucb_factory(alpha=1.0)
 
     linucb.fit(contexts, decisions, rewards)
 
