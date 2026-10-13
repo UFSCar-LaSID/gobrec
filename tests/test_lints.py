@@ -10,6 +10,7 @@ import gobrec
 
 import numpy as np
 import torch
+import pytest
 
 
 class MockRNG:
@@ -23,12 +24,25 @@ class MockRNG:
 
         return value
 
+@pytest.fixture(params=[False, True], ids=["cpu", "gpu"])
+def lin_ts_factory(request):
+    use_gpu = request.param
+
+    if use_gpu and not torch.cuda.is_available():
+        pytest.skip("CUDA is not available")
+
+    def create_lints(**kwargs):
+        return gobrec.mabs.lin_mabs.LinTS(
+            use_gpu=use_gpu,
+            **kwargs,
+        )
+
+    return create_lints
 
 
 
 
-
-def test_alpha_zero_equals_lin():
+def test_alpha_zero_equals_lin(lin_ts_factory):
     contexts = np.array([
         [1, 0, 0, 0, 1],
         [0, 1, 2, 3, 4],
@@ -41,18 +55,16 @@ def test_alpha_zero_equals_lin():
     decisions = np.array([1, 1, 1, 0, 0, 1])
     rewards = np.array([0, 1, 1, 0, 1, 0])
 
-    lints = gobrec.mabs.lin_mabs.LinTS(
+    lints = lin_ts_factory(
         alpha=0.0,
         l2_lambda=1.0,
         seed=123,
-        use_gpu=False,
     )
 
     lin = gobrec.mabs.lin_mabs.LinGreedy(
         epsilon=0.0,
         l2_lambda=1.0,
         seed=123,
-        use_gpu=False,
     )
 
     lints.fit(contexts, decisions, rewards)
@@ -72,7 +84,7 @@ def test_alpha_zero_equals_lin():
 
 
 
-def test_mocked_random_sampling():
+def test_mocked_random_sampling(lin_ts_factory):
     contexts = np.array([
         [1, 0, 0],
         [0, 1, 0],
@@ -92,10 +104,9 @@ def test_mocked_random_sampling():
         1, 10, 0,
     ])
 
-    lints = gobrec.mabs.lin_mabs.LinTS(
+    lints = lin_ts_factory(
         alpha=1.0,
         l2_lambda=1.0,
-        use_gpu=False,
     )
 
     lints.fit(contexts, decisions, rewards)
@@ -142,7 +153,7 @@ def test_mocked_random_sampling():
 
 
 
-def test_alpha_scales_random_component():
+def test_alpha_scales_random_component(lin_ts_factory):
     contexts = np.array([
         [1, 0, 0],
         [0, 1, 0],
@@ -172,16 +183,14 @@ def test_alpha_scales_random_component():
         [0.0, 1.0, 0.0],
     ])
 
-    mab_alpha_1 = gobrec.mabs.lin_mabs.LinTS(
+    mab_alpha_1 = lin_ts_factory(
         alpha=1.0,
         l2_lambda=1.0,
-        use_gpu=False,
     )
 
-    mab_alpha_2 = gobrec.mabs.lin_mabs.LinTS(
+    mab_alpha_2 = lin_ts_factory(
         alpha=2.0,
         l2_lambda=1.0,
-        use_gpu=False,
     )
 
     mab_alpha_1.fit(contexts, decisions, rewards)
@@ -222,10 +231,7 @@ def test_alpha_scales_random_component():
     assert np.allclose(pred2, expected2, atol=1e-8)
 
 
-
-
-
-def test_mocked_rng_changes_prediction():
+def test_mocked_rng_changes_prediction(lin_ts_factory):
     contexts = np.array([
         [1, 0, 0],
         [0, 1, 0],
@@ -247,10 +253,9 @@ def test_mocked_rng_changes_prediction():
 
     test_contexts = np.eye(3)
 
-    mab = gobrec.mabs.lin_mabs.LinTS(
+    mab = lin_ts_factory(
         alpha=1.0,
         l2_lambda=1.0,
-        use_gpu=False,
     )
 
     mab.fit(contexts, decisions, rewards)
@@ -267,7 +272,7 @@ def test_mocked_rng_changes_prediction():
     assert not np.allclose(pred1, pred2)
 
 
-def test_seed_reproducibility():
+def test_seed_reproducibility(lin_ts_factory):
     contexts = np.array([
         [0, 1, 2, 3, 5],
         [1, 1, 1, 1, 1],
@@ -279,16 +284,14 @@ def test_seed_reproducibility():
     decisions = np.array([1, 1, 2, 2, 3])
     rewards = np.array([0, 1, 0, 1, 1])
 
-    mab1 = gobrec.mabs.lin_mabs.LinTS(
+    mab1 = lin_ts_factory(
         seed=123456,
         alpha=0.5,
-        use_gpu=False,
     )
 
-    mab2 = gobrec.mabs.lin_mabs.LinTS(
+    mab2 = lin_ts_factory(
         seed=123456,
         alpha=0.5,
-        use_gpu=False,
     )
 
     mab1.fit(contexts, decisions, rewards)
@@ -299,7 +302,7 @@ def test_seed_reproducibility():
 
     assert np.allclose(pred1, pred2)
 
-def test_different_seed_changes_sampling():
+def test_different_seed_changes_sampling(lin_ts_factory):
     contexts = np.array([
         [0, 1, 2, 3, 5],
         [1, 1, 1, 1, 1],
@@ -311,16 +314,14 @@ def test_different_seed_changes_sampling():
     decisions = np.array([1, 1, 2, 2, 3])
     rewards = np.array([0, 1, 0, 1, 1])
 
-    mab1 = gobrec.mabs.lin_mabs.LinTS(
+    mab1 = lin_ts_factory(
         seed=123,
         alpha=1.0,
-        use_gpu=False,
     )
 
-    mab2 = gobrec.mabs.lin_mabs.LinTS(
+    mab2 = lin_ts_factory(
         seed=456,
         alpha=1.0,
-        use_gpu=False,
     )
 
     mab1.fit(contexts, decisions, rewards)
