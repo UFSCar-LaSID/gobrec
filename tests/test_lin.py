@@ -8,21 +8,40 @@ local_path = os.path.abspath(
 sys.path.insert(0, local_path)
 import gobrec
 import numpy as np
+import pytest
+import torch
 
 
-def test_predict_one_arm():
+@pytest.fixture(params=[False, True], ids=["cpu", "gpu"])
+def lin_factory(request):
+    use_gpu = request.param
+
+    if use_gpu and not torch.cuda.is_available():
+        pytest.skip("CUDA is not available")
+
+    def create_lin(**kwargs):
+        return gobrec.mabs.lin_mabs.Lin(
+            use_gpu=use_gpu,
+            **kwargs,
+        )
+
+    return create_lin
+
+
+
+def test_predict_one_arm(lin_factory):
     contexts = np.array([[1, 0, 2, 1, 1], [3, 1, 2, 3, 4], [2, -1, 1, 0, 2]])
     decisions = np.array([0, 0, 0])
     rewards = np.array([3, 3, 1])
 
-    lin = gobrec.mabs.lin_mabs.Lin(l2_lambda=1.0, use_gpu=False)
+    lin = lin_factory(l2_lambda=1.0)
 
     lin.fit(contexts, decisions, rewards)
     pred = lin.predict(np.array([[0, 1, 2, 3, 5]])).cpu().numpy()
 
     assert np.allclose(pred, np.array([2.8167701863354]), atol=1e-8)
 
-def test_predict_multiple_arms():
+def test_predict_multiple_arms(lin_factory):
     decisions = np.array(["a", "a", "a",
                           "b", "b", "b",
                           "c", "c", "c"])
@@ -33,7 +52,7 @@ def test_predict_multiple_arms():
         0, 1, 10
     ])
 
-    lin = gobrec.mabs.lin_mabs.Lin(l2_lambda=1.0)
+    lin = lin_factory(l2_lambda=1.0)
 
     lin.fit(contexts, decisions, rewards)
 
@@ -47,7 +66,7 @@ def test_predict_multiple_arms():
 
     assert np.allclose(pred, expected)
 
-def test_fit():
+def test_fit(lin_factory):
     contexts = np.array([
         [1, 0, 2, 1, 1],
         [3, 1, 2, 3, 4],
@@ -57,7 +76,7 @@ def test_fit():
     rewards = np.array([3, 3, 1])
     decisions = np.array([1, 1, 1])
 
-    lin = gobrec.mabs.lin_mabs.Lin(l2_lambda=1.0)
+    lin = lin_factory(l2_lambda=1.0)
 
     lin.fit(contexts, decisions, rewards)
 
@@ -80,7 +99,7 @@ def test_fit():
     rewards = np.array([3, 3, 1, 0, -1, 2, 1, 2, 1, 1, 0, 3])
     decisions = np.array([1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1])
 
-    lin = gobrec.mabs.lin_mabs.Lin(l2_lambda=1.0)
+    lin = lin_factory(l2_lambda=1.0)
 
     lin.fit(contexts, decisions, rewards)
 
@@ -94,13 +113,13 @@ def test_fit():
 
     assert np.allclose(lin.beta[0].cpu(), expected)
 
-def test_incremental_fit():
+def test_incremental_fit(lin_factory):
     # First batch
     context1 = np.array([[1, 0, 0, 0, 1], [0, 1, 2, 3, 4], [2, 0, 1, 0, 2],])
     rewards1 = np.array([3, 2, 1])
     decisions1 = np.array([1, 1, 1])
 
-    lin = gobrec.mabs.lin_mabs.Lin(l2_lambda=1.0, use_gpu=False)
+    lin = lin_factory(l2_lambda=1.0)
 
     lin.fit(context1, decisions1, rewards1)
 
@@ -167,14 +186,14 @@ def test_incremental_fit():
         atol=1e-8,
     )
 
-def test_incremental_vs_full_fit():
+def test_incremental_vs_full_fit(lin_factory):
     # Batch fit - all data at once
     contexts_batch = np.array([[1, 0, 0, 0, 1], [0, 1, 2, 3, 4], [2, 0, 1, 0, 2],
                                [2, 1, 2, 1, 2], [3, 3, 3, 2, 1], [1, 1, 1, 1, 1]])
     rewards_batch = np.array([0, 1, 1, 0, 1, 0])
     decisions_batch = np.array([1, 1, 1, 0, 0, 1])
 
-    lin_batch = gobrec.mabs.lin_mabs.Lin(use_gpu=False)
+    lin_batch = lin_factory()
 
     lin_batch.fit(
         contexts_batch,
@@ -191,7 +210,7 @@ def test_incremental_vs_full_fit():
     rewards2 = np.array([0, 1, 0])
     decisions2 = np.array([0, 0, 1])
 
-    lin_inc = gobrec.mabs.lin_mabs.Lin(use_gpu=False)
+    lin_inc = lin_factory()
 
     lin_inc.fit(contexts1, decisions1, rewards1)
     lin_inc.fit(contexts2, decisions2, rewards2)
@@ -219,7 +238,7 @@ def test_incremental_vs_full_fit():
         atol=1e-8,
     )
 
-def test_incremental_different_order():
+def test_incremental_different_order(lin_factory):
     contexts1 = np.array([[1, 0, 0, 0, 1], [0, 1, 2, 3, 4], [2, 0, 1, 0, 2]])
     rewards1 = np.array([0, 1, 1])
     decisions1 = np.array([1, 1, 1])
@@ -228,9 +247,8 @@ def test_incremental_different_order():
     rewards2 = np.array([0, 1, 0])
     decisions2 = np.array([0, 0, 1])
 
-    lin12 = gobrec.mabs.lin_mabs.Lin(
+    lin12 = lin_factory(
         l2_lambda=1.0,
-        use_gpu=False,
     )
     lin12.fit(
         contexts1,
@@ -243,9 +261,8 @@ def test_incremental_different_order():
         rewards2,
     )
 
-    lin21 = gobrec.mabs.lin_mabs.Lin(
+    lin21 = lin_factory(
         l2_lambda=1.0,
-        use_gpu=False,
     )
     lin21.fit(
         contexts2,
@@ -284,7 +301,7 @@ def test_incremental_different_order():
             atol=1e-8,
         )
     
-def test_batch_vs_3_incremental_fit():
+def test_batch_vs_3_incremental_fit(lin_factory):
     contexts = np.array([
         [1, 0, 0, 0, 1],[0, 1, 2, 3, 4],[2, 0, 1, 0, 2],
         [2, 1, 2, 1, 2],[3, 3, 3, 2, 1],[1, 1, 1, 1, 1],
@@ -301,9 +318,8 @@ def test_batch_vs_3_incremental_fit():
         0, 1, 0,
     ])
 
-    lin_batch = gobrec.mabs.lin_mabs.Lin(
+    lin_batch = lin_factory(
         l2_lambda=1.0,
-        use_gpu=False,
     )
 
     lin_batch.fit(
@@ -314,9 +330,8 @@ def test_batch_vs_3_incremental_fit():
 
 
 
-    lin_incremental = gobrec.mabs.lin_mabs.Lin(
+    lin_incremental = lin_factory(
         l2_lambda=1.0,
-        use_gpu=False,
     )
 
     lin_incremental.fit(
@@ -371,14 +386,13 @@ def test_batch_vs_3_incremental_fit():
         atol=1e-8,
     )
 
-def test_l2_low():
+def test_l2_low(lin_factory):
     context = np.array([[1, 1, 0, 0, 1],[0, 1, 2, 9, 4],[2, 3, 1, 0, 2]])
     rewards = np.array([3, 2, 1])
     decisions = np.array([1, 1, 1])
 
-    lin = gobrec.mabs.lin_mabs.Lin(
+    lin = lin_factory(
         l2_lambda=0.1,
-        use_gpu=False,
     )
 
     lin.fit(context, decisions, rewards)
@@ -400,14 +414,13 @@ def test_l2_low():
         atol=1e-8,
     )
 
-def test_l2_high():
+def test_l2_high(lin_factory):
     context = np.array([[1, 1, 0, 0, 1],[0, 1, 2, 9, 4],[2, 3, 1, 0, 2]])
     rewards = np.array([3, 2, 1])
     decisions = np.array([1, 1, 1])
 
-    lin = gobrec.mabs.lin_mabs.Lin(
+    lin = lin_factory(
         l2_lambda=10,
-        use_gpu=False,
     )
 
     lin.fit(context, decisions, rewards)
@@ -429,7 +442,7 @@ def test_l2_high():
         atol=1e-8,
     )
 
-def test_l2_0():
+def test_l2_0(lin_factory):
     context = np.array([[1, 0, 2, 1, 1], [3, 1, 2, 3, 4], [2, -1, 1, 0, 2], [-1, 4, 2, 0, 1],
                         [2, 2, 2, 2, 2], [3, 2, 1, 2, 3], [0, 0, 0, 0, 0], [2, 1, 1, 1, 2],
                         [3, 2, 3, 2, 3], [8, 2, 3, 1, 0], [1, 2, -9, -7, 1], [0, 1, 1, 1, 1]])
@@ -444,9 +457,8 @@ def test_l2_0():
         1, 1, 1, 1,
     ])
 
-    lin = gobrec.mabs.lin_mabs.Lin(
+    lin = lin_factory(
         l2_lambda=0,
-        use_gpu=False,
     )
 
     lin.fit(context, decisions, rewards)
