@@ -1,86 +1,17 @@
 """Abstract class for Multi-Armed Bandit algorithms.
 
 This class defines the interface for MAB algorithms to be used in the GOBRec
-recommender system. It also includes a label encoder to handle item IDs.
+recommender system.
 """
+
+
+
 from abc import ABC, abstractmethod
 import numpy as np
 from typing import Union
 import torch
+from gobrec.mabs import LabelEncoder
 
-
-class _LabelEncoder:
-    """A simple label encoder to convert item IDs to integer indices and vice versa.
-
-    Different from sklearn's LabelEncoder, this implementation can be updated with new
-    classes after fitting. This is useful for MAB algorithms where new items may appear
-    over time.
-
-    Attributes
-    ----------
-    class_to_index : dict[Union[str, int], int]
-        A mapping from item IDs, which can be strings or integers, to integer indices.
-    index_to_class : list[Union[str, int]]
-        A list mapping integer indices back to item IDs.
-    """
-
-    def __init__(self):
-        """Initialize the label encoder."""
-        self.class_to_index: dict[Union[str, int], int] = {}
-        self.index_to_class: list[Union[str, int]] = []
-
-    def fit(self, decisions: np.ndarray):
-        """Fit the label encoder with the provided item IDs.
-
-        New item IDs will be added to the existing mapping.
-        Different from sklearn.label_encoder, this method can
-        be called multiple times to update the mapping.
-
-        Parameters
-        ----------
-        decisions : np.ndarray
-            A 1D array of item IDs, which can be strings or integers.
-        """
-        for cls in decisions:
-            if cls not in self.class_to_index:
-                idx = len(self.index_to_class)
-                self.class_to_index[cls] = idx
-                self.index_to_class.append(cls)
-
-    def transform(self, decisions: np.ndarray) -> np.ndarray:
-        """Transform item IDs to encoded integer indices.
-
-        Parameters
-        ----------
-        decisions : np.ndarray
-            A 1D array of item IDs, which can be strings or integers.
-        
-        Returns
-        -------
-        indices : np.ndarray
-            A 1D array of integer indices corresponding to the item IDs.
-        """
-        return np.array([self.class_to_index[cls] for cls in decisions])
-
-    def inverse_transform(self, indices: np.ndarray) -> np.ndarray:
-        """Transform encoded integer indices back to item IDs.
-
-        Parameters
-        ----------
-        indices : np.ndarray
-            A 1D array of integer indices.
-        
-        Returns
-        -------
-        item_ids : np.ndarray
-            A 1D array of item IDs corresponding to the integer indices.
-        """
-        return np.array([self.index_to_class[idx] for idx in indices])
-
-    @property
-    def classes_(self):
-        """Array of item IDs known to the encoder."""
-        return np.array(self.index_to_class)
 
 
 class MABAlgo(ABC):
@@ -96,7 +27,7 @@ class MABAlgo(ABC):
         Random seed for reproducibility.
     rng : np.random.Generator
         Random number generator, initialized with the provided seed.
-    label_encoder : _LabelEncoder
+    label_encoder : LabelEncoder
         A label encoder to convert item IDs to integer indices and vice versa.
     num_arms : int
         The number of unique arms (items) known to the algorithm. It starts as None and
@@ -136,7 +67,7 @@ class MABAlgo(ABC):
             The number of features in the context vectors.
         """
         if self.label_encoder is None:
-            self.label_encoder = _LabelEncoder()
+            self.label_encoder = LabelEncoder()
         self.label_encoder.fit(decisions)
         self.num_arms = len(self.label_encoder.classes_)
         
