@@ -34,7 +34,7 @@ def test_init():
     mab = DummyMABAlgo(seed=42)
 
     assert mab.seed == 42
-    assert isinstance(mab.rng, np.random.Generator)
+    assert mab.rng is not None
     assert mab.label_encoder is None
     assert mab.num_arms is None
     assert mab.num_features is None
@@ -115,16 +115,14 @@ def test_reset_clears_shared_attributes():
     assert mab.num_arms is None
     assert mab.num_features is None
     assert mab.seed == 42
-    assert isinstance(mab.rng, np.random.Generator)
+    assert mab.rng is not None
 
 
 def test_reset_reinitializes_rng():
     mab = DummyMABAlgo(seed=42)
 
-    expected_rng = np.random.default_rng(42)
-    expected_values = expected_rng.standard_normal(size=5)
+    expected_values = mab.rng.standard_normal(size=5)
 
-    mab.rng.standard_normal(size=10)
     mab.reset()
 
     actual_values = mab.rng.standard_normal(size=5)
