@@ -8,8 +8,24 @@ local_path = os.path.abspath(
 sys.path.insert(0, local_path)
 import gobrec
 import numpy as np
+import pytest
+import torch
 
 
+@pytest.fixture(params=[False, True], ids=["cpu", "gpu"])
+def lin_greedy_factory(request):
+    use_gpu = request.param
+
+    if use_gpu and not torch.cuda.is_available():
+        pytest.skip("CUDA is not available")
+
+    def create_lingreedy(**kwargs):
+        return gobrec.mabs.lin_mabs.LinGreedy(
+            use_gpu=use_gpu,
+            **kwargs,
+        )
+
+    return create_lingreedy
 
 class MockRNG:
     def __init__(self, values):
@@ -22,19 +38,19 @@ class MockRNG:
 # alpha = 0, so it should be equal to Lin
 # so, the below codes are the same from lin
 
-def test_predict_one_arm():
+def test_predict_one_arm(lin_greedy_factory):
     contexts = np.array([[1, 0, 2, 1, 1], [3, 1, 2, 3, 4], [2, -1, 1, 0, 2]])
     decisions = np.array([0, 0, 0])
     rewards = np.array([3, 3, 1])
 
-    lin = gobrec.mabs.lin_mabs.LinGreedy(epsilon=0.0, l2_lambda=1.0, use_gpu=False)
+    lin = lin_greedy_factory(epsilon=0.0, l2_lambda=1.0)
 
     lin.fit(contexts, decisions, rewards)
     pred = lin.predict(np.array([[0, 1, 2, 3, 5]])).cpu().numpy()
 
     assert np.allclose(pred, np.array([2.8167701863354]), atol=1e-8)
 
-def test_predict_multiple_arms():
+def test_predict_multiple_arms(lin_greedy_factory):
     decisions = np.array(["a", "a", "a",
                           "b", "b", "b",
                           "c", "c", "c"])
@@ -45,7 +61,7 @@ def test_predict_multiple_arms():
         0, 1, 10
     ])
 
-    lin = gobrec.mabs.lin_mabs.LinGreedy(epsilon=0.0, l2_lambda=1.0)
+    lin = lin_greedy_factory(epsilon=0.0, l2_lambda=1.0)
 
     lin.fit(contexts, decisions, rewards)
 
@@ -59,7 +75,7 @@ def test_predict_multiple_arms():
 
     assert np.allclose(pred, expected)
 
-def test_fit():
+def test_fit(lin_greedy_factory):
     contexts = np.array([
         [1, 0, 2, 1, 1],
         [3, 1, 2, 3, 4],
@@ -69,7 +85,7 @@ def test_fit():
     rewards = np.array([3, 3, 1])
     decisions = np.array([1, 1, 1])
 
-    lin = gobrec.mabs.lin_mabs.LinGreedy(epsilon=0.0, l2_lambda=1.0)
+    lin = lin_greedy_factory(epsilon=0.0, l2_lambda=1.0)
 
     lin.fit(contexts, decisions, rewards)
 
@@ -92,7 +108,7 @@ def test_fit():
     rewards = np.array([3, 3, 1, 0, -1, 2, 1, 2, 1, 1, 0, 3])
     decisions = np.array([1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1])
 
-    lin = gobrec.mabs.lin_mabs.LinGreedy(epsilon=0.0, l2_lambda=1.0)
+    lin = lin_greedy_factory(epsilon=0.0, l2_lambda=1.0)
 
     lin.fit(contexts, decisions, rewards)
 
@@ -106,13 +122,13 @@ def test_fit():
 
     assert np.allclose(lin.beta[0].cpu(), expected)
 
-def test_incremental_fit():
+def test_incremental_fit(lin_greedy_factory):
     # First batch
     context1 = np.array([[1, 0, 0, 0, 1], [0, 1, 2, 3, 4], [2, 0, 1, 0, 2],])
     rewards1 = np.array([3, 2, 1])
     decisions1 = np.array([1, 1, 1])
 
-    lin = gobrec.mabs.lin_mabs.LinGreedy(epsilon=0.0, l2_lambda=1.0, use_gpu=False)
+    lin = lin_greedy_factory(epsilon=0.0, l2_lambda=1.0)
 
     lin.fit(context1, decisions1, rewards1)
 
@@ -179,14 +195,14 @@ def test_incremental_fit():
         atol=1e-8,
     )
 
-def test_incremental_vs_full_fit():
+def test_incremental_vs_full_fit(lin_greedy_factory):
     # Batch fit - all data at once
     contexts_batch = np.array([[1, 0, 0, 0, 1], [0, 1, 2, 3, 4], [2, 0, 1, 0, 2],
                                [2, 1, 2, 1, 2], [3, 3, 3, 2, 1], [1, 1, 1, 1, 1]])
     rewards_batch = np.array([0, 1, 1, 0, 1, 0])
     decisions_batch = np.array([1, 1, 1, 0, 0, 1])
 
-    lin_batch = gobrec.mabs.lin_mabs.LinGreedy(epsilon=0.0, use_gpu=False)
+    lin_batch = lin_greedy_factory(epsilon=0.0)
 
     lin_batch.fit(
         contexts_batch,
@@ -203,7 +219,7 @@ def test_incremental_vs_full_fit():
     rewards2 = np.array([0, 1, 0])
     decisions2 = np.array([0, 0, 1])
 
-    lin_inc = gobrec.mabs.lin_mabs.LinGreedy(epsilon=0.0, use_gpu=False)
+    lin_inc = lin_greedy_factory(epsilon=0.0)
 
     lin_inc.fit(contexts1, decisions1, rewards1)
     lin_inc.fit(contexts2, decisions2, rewards2)
@@ -232,13 +248,7 @@ def test_incremental_vs_full_fit():
     )
 
 
-
-
-
-
-# now tests about the randomness of the lingreedy
-
-def test_epsilon_1():
+def test_epsilon_1(lin_greedy_factory):
     contexts = np.array([
         [0, 1, 2, 3, 5], [1, 1, 1, 1, 1], [0, 0, 1, 0, 0], [0, 2, 2, 3, 5], [1, 3, 1, 1, 1],
         [0, 0, 0, 0, 0], [0, 1, 4, 3, 5], [0, 1, 2, 4, 5], [1, 2, 1, 1, 3], [0, 2, 1, 0, 0]
@@ -254,10 +264,9 @@ def test_epsilon_1():
         0, 1, 1, 1, 1
     ])
 
-    lin_greedy = gobrec.mabs.lin_mabs.LinGreedy(
+    lin_greedy = lin_greedy_factory(
         epsilon=1.0,
         seed=123456,
-        use_gpu=False
     )
 
     lin_greedy.fit(contexts, decisions, rewards)
@@ -273,7 +282,7 @@ def test_epsilon_1():
     assert np.all(pred >= 0)
     assert np.all(pred < 1)
 
-def test_epsilon_mixed_with_mocked_rng():
+def test_epsilon_mixed_with_mocked_rng(lin_greedy_factory):
     contexts = np.array([
         [0, 1, 2, 3, 5], [1, 1, 1, 1, 1], [0, 0, 1, 0, 0], [0, 2, 2, 3, 5]
     ])
@@ -282,14 +291,13 @@ def test_epsilon_mixed_with_mocked_rng():
 
     rewards = np.array([1, 2, 3, 4])
 
-    lin_greedy = gobrec.mabs.lin_mabs.LinGreedy(
+    lin_greedy = lin_greedy_factory(
         epsilon=0.5,
-        use_gpu=False
     )
 
     lin_greedy.fit(contexts, decisions, rewards)
 
-    expected_exploitation = gobrec.mabs.lin_mabs.Lin.predict(
+    expected_exploitation = gobrec.mabs.lin_mabs.Lin.predict(  # Uses the base Lin class to compute the expected exploitation scores
         lin_greedy,
         contexts
     )
@@ -316,7 +324,7 @@ def test_epsilon_mixed_with_mocked_rng():
     assert np.allclose(pred, expected)
 
 
-def test_seed_reproducibility():
+def test_seed_reproducibility(lin_greedy_factory):
     contexts = np.array([
         [0, 1, 2, 3, 5], [1, 1, 1, 1, 1], [0, 0, 1, 0, 0], [0, 2, 2, 3, 5], [1, 3, 1, 1, 1]
     ])
@@ -325,16 +333,14 @@ def test_seed_reproducibility():
 
     rewards = np.array([0, 1, 0, 1, 1])
 
-    mab1 = gobrec.mabs.lin_mabs.LinGreedy(
+    mab1 = lin_greedy_factory(
         seed=123456,
         epsilon=0.5,
-        use_gpu=False
     )
 
-    mab2 = gobrec.mabs.lin_mabs.LinGreedy(
+    mab2 = lin_greedy_factory(
         seed=123456,
         epsilon=0.5,
-        use_gpu=False
     )
 
     mab1.fit(contexts, decisions, rewards)
@@ -345,7 +351,7 @@ def test_seed_reproducibility():
 
     assert np.allclose(pred1, pred2)
 
-def test_different_seed_changes_exploration():
+def test_different_seed_changes_exploration(lin_greedy_factory):
     contexts = np.array([
         [0, 1, 2, 3, 5], [1, 1, 1, 1, 1], [0, 0, 1, 0, 0], [0, 2, 2, 3, 5], [1, 3, 1, 1, 1]
     ])
@@ -354,16 +360,14 @@ def test_different_seed_changes_exploration():
 
     rewards = np.array([0, 1, 0, 1, 1])
 
-    mab1 = gobrec.mabs.lin_mabs.LinGreedy(
+    mab1 = lin_greedy_factory(
         seed=123,
         epsilon=1.0,
-        use_gpu=False
     )
 
-    mab2 = gobrec.mabs.lin_mabs.LinGreedy(
+    mab2 = lin_greedy_factory(
         seed=456,
         epsilon=1.0,
-        use_gpu=False
     )
 
     mab1.fit(contexts, decisions, rewards)
