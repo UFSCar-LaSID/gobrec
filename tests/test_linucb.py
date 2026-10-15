@@ -452,8 +452,8 @@ def test_fit(lin_ucb_factory):
     assert linucb.num_features == 5
     assert linucb.num_arms == 3
 
-    assert np.allclose(-0.0825688, linucb.beta[0][0], atol=0.00001)
-    assert np.allclose(0.023696, linucb.beta[2][0], atol=0.00001)
+    assert np.allclose(-0.0825688, linucb.beta[0][0].cpu().numpy(), atol=0.00001)
+    assert np.allclose(0.023696, linucb.beta[2][0].cpu().numpy(), atol=0.00001)
 
 
 
@@ -480,8 +480,8 @@ def test_partial_fit(lin_ucb_factory):
     assert linucb.num_features == 5
     assert linucb.num_arms == 3
 
-    assert np.isclose(-0.0825688, linucb.beta[0][0], atol=0.00001)
-    assert np.isclose(0.023696, linucb.beta[2][0], atol=0.00001)
+    assert np.isclose(-0.0825688, linucb.beta[0][0].cpu().numpy(), atol=0.00001)
+    assert np.isclose(0.023696, linucb.beta[2][0].cpu().numpy(), atol=0.00001)
 
     contexts2 = np.array([[0, 1, 1, 1, 1], [1, 1, 1, 1, 1], [0, 0, 1, 0, 0]])
     decisions2 = np.array([1, 3, 4])
@@ -489,5 +489,5 @@ def test_partial_fit(lin_ucb_factory):
 
     linucb.fit(contexts2, decisions2, rewards2)
 
-    assert np.isclose(-0.05142857, linucb.beta[0][0], atol=0.00001)
-    assert np.isclose(0.22099152, linucb.beta[2][0], atol=0.00001)
+    assert np.isclose(-0.05142857, linucb.beta[0][0].cpu().numpy(), atol=0.00001)
+    assert np.isclose(0.22099152, linucb.beta[2][0].cpu().numpy(), atol=0.00001)
