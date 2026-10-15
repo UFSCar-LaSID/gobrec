@@ -59,7 +59,9 @@ More installation options can be found in the [documentation](https://ufscar-las
 
 ## Usage
 
-This section shows two examples of how to use GOBRec. You can also use the available [Jupyter notebook](notebooks/usage_tutorial.ipynb) to reproduce the examples and verify the generated output.
+This section presents two examples demonstrating how to use GOBRec. To reproduce these examples and inspect their outputs, you can run the accompanying [usage tutorial Jupyter notebook](notebooks/usage_tutorial.ipynb).
+
+For a more comprehensive introduction to the library, including additional explanations and examples, refer to the [full tutorial Jupyter notebook](notebooks/full_tutorial.ipynb).
 
 ### Using an MAB Algorithm individually to generate arm scores
 
