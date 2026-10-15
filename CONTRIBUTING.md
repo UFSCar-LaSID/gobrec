@@ -45,7 +45,7 @@ make html
 
 ### Generating a new version of the Python package (for PyPI)
 
-First, it is necessary to update the library version inside the [setup.py](/setup.py).
+First, it is necessary to update the library version inside the [pyproject.toml](/pyproject.toml).
 
 Then, you can execute the following command to generate the library builds:
 
