@@ -47,6 +47,12 @@ make html
 
 First, it is necessary to update the library version inside the [pyproject.toml](/pyproject.toml).
 
+Install the build package:
+
+```
+python -m pip install build 
+```
+
 Then, you can execute the following command to generate the library builds:
 
 ```
