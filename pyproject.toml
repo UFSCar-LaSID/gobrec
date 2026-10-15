@@ -6,7 +6,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "gobrec"
-version = "1.0.6"
+version = "1.0.8"
 description = "GOBRec: GPU Optimized Bandits Recommender"
 readme = "pypi_README.md"
 
@@ -16,7 +16,7 @@ authors = [
     { name = "Rafael Tofoli Sereicikas", email = "rafaeltofoli@estudante.ufscar.br" },
     { name = "Tiago Agostinho de Almeida", email = "talmeida@ufscar.br" }
 ]
-license = "MIT"
+license = {text = "MIT"}
 
 keywords = [
     "recommender-systems",
@@ -54,5 +54,5 @@ ignore = ["D107"]
 [tool.ruff.lint.pydocstyle]
 convention = "numpy"
 
-[tool.setuptools]
-packages = ["gobrec"]
+[tool.setuptools.packages.find]
+include = ["gobrec*"]
